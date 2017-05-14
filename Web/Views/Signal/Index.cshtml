@@ -1,0 +1,18 @@
+﻿@*<form action="@Url.Action("Signal")">
+	<input type="submit" value="Submit"/>
+</form>*@
+
+<input id="start-simulation-btn" type="button" value="Submit" />
+
+<script>
+	$(function () {
+		var notif = $.connection.NotificationHub;
+
+		$.connection.hub.start().done(function() {
+			$('#start-simulation-btn').click(function () {
+				notif.server.startSimulation();
+				$('#start-simulation-btn').attr("disabled", "disabled");
+			});
+		});
+	}());
+</script>

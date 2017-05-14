@@ -1,24 +1,109 @@
-﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+﻿<div class="text-center">
+	<h1>Corporate Action Lifecycle</h1>
 </div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
-    </div>
+
+<div id="timeline" class="outlined"></div>
+
+<div data-bind="foreach: processes" class="processes-container outlined">
+	<div data-bind="attr: { id: id }" class="processes-item process-container outlined">
+
+		<h4 data-bind="text: title" class="justified"></h4>
+
+		<div class="process-item justified">
+			<div class="text-bold">Target date:</div>
+			<ul data-bind="foreach: targetDateItems()">
+				<li data-bind="text: $data"></li>
+			</ul>
+		</div>
+
+		<div class="process-item justified">
+			<div class="text-bold">Critical date:</div>
+			<ul data-bind="foreach: criticalDateItems()">
+				<li data-bind="text: $data"></li>
+			</ul>
+		</div>
+	</div>
 </div>
+
+<div>
+	<br />
+
+	<input type="checkbox" id="scrubChbx" class="js-process-chbx" checked="checked" data-id="scrub" />
+	<label for="scrubChbx">CA Scrubbing</label>
+
+
+	<input type="checkbox" id="notifChbx" class="js-process-chbx" checked="checked" data-id="notif" />
+	<label for="notifChbx">Notification</label>
+
+
+	<input type="checkbox" id="respoChbx" class="js-process-chbx" checked="checked" data-id="respo" />
+	<label for="respoChbx">Response</label>
+
+
+	<input type="checkbox" id="instrChbx" class="js-process-chbx" checked="checked" data-id="instr" />
+	<label for="instrChbx">Instruction</label>
+
+
+	<input type="checkbox" id="paymeChbx" class="js-process-chbx" checked="checked" data-id="payme" />
+	<label for="paymeChbx">Payment</label>
+
+	<br />
+</div>
+
+<script type="text/javascript">
+
+	$(function() {
+		var notif = $.connection.NotificationHub;
+
+		notif.client.update = function (data) {
+			update(data);
+		};
+
+		$.connection.hub.start();
+	}());
+
+	function update(data) {
+		var processes = [],
+			process,
+			i;
+
+		for (i = 0; i < data.length; i++) {
+			process = data[i];
+			processes.push(new Process(process.id, process.title, process.targetDateItems, process.criticalDateItems));
+		}
+
+		viewModel.processes(processes);
+	}
+
+	function Process(id, title, targetDateItems, criticalDateItems) {
+		this.id = id;
+		this.title = title;
+		this.targetDateItems = ko.observableArray(targetDateItems);
+		this.criticalDateItems = ko.observableArray(criticalDateItems);
+	}
+
+	function AppViewModel() {
+		this.processes = ko.observableArray();
+	}
+
+	var viewModel = new AppViewModel();
+	viewModel.processes([
+		new Process("scrub", "CA Scrubbing", [], []),
+		new Process("notif", "Notification", [], []),
+		new Process("respo", "Response", [], []),
+		new Process("instr", "Instruction", [], []),
+		new Process("payme", "Payment", [], [])
+	]);
+
+	ko.applyBindings(viewModel);
+
+	var container = document.getElementById("timeline");
+	var data = [];
+	var options = {};
+	var timeline = new vis.Timeline(container, data, options);
+
+	$(".js-process-chbx").click(function () {
+		var processId = "#" + $(this).data("id");
+		$(processId).toggle();
+	});
+</script>

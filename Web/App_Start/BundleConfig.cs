@@ -20,8 +20,12 @@ namespace Web
 					  "~/Scripts/respond.js"));
 
 			bundles.Add(new StyleBundle("~/Content/css").Include(
+					  "~/lib/vis-4.19.1/dist/vis.css",
 					  "~/Content/bootstrap.css",
 					  "~/Content/site.css"));
+
+			bundles.Add(new ScriptBundle("~/bundles/vis").Include(
+					  "~/lib/vis-4.19.1/dist/vis.js"));
 		}
 	}
 }
