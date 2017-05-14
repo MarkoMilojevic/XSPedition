@@ -8,7 +8,7 @@ namespace Web.Entities
 {
 	public class XspDbContext : DbContext
 	{
-		public XspDbContext()
+		public XspDbContext() //: base("AzureConnection")
 		{
 			
 		}
@@ -54,9 +54,5 @@ namespace Web.Entities
 
 		#endregion SYSTEM
 
-		protected override void OnModelCreating(DbModelBuilder modelBuilder)
-		{
-
-		}
 	}
 }

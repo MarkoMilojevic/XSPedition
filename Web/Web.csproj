@@ -353,6 +353,7 @@
     <Content Include="lib\vis-4.19.1\misc\we_need_help.md" />
     <Content Include="lib\vis-4.19.1\package.json" />
     <Content Include="lib\vis-4.19.1\README.md" />
+	<None Include="Properties\PublishProfiles\xspedition - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="lib\vis-4.19.1\.gitignore" />
     <Content Include="lib\vis-4.19.1\dist\img\network\acceptDeleteIcon.png" />
