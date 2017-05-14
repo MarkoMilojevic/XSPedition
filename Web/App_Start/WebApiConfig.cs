@@ -1,4 +1,6 @@
 ﻿using System.Web.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Web
 {
@@ -16,6 +18,15 @@ namespace Web
 				routeTemplate: "api/{controller}/{id}",
 				defaults: new { id = RouteParameter.Optional }
 			);
+
+			config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
+			
+			//Format JSON
+			config.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.Indented;
+
+			// config.Formatters.JsonFormatter.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
+
+			config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 		}
 	}
 }

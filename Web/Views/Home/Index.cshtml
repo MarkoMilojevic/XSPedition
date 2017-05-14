@@ -25,55 +25,23 @@
 	</div>
 </div>
 
-<div>
-	<br />
-
-	<input type="checkbox" id="scrubChbx" class="js-process-chbx" checked="checked" data-id="scrub" />
-	<label for="scrubChbx">CA Scrubbing</label>
-
-
-	<input type="checkbox" id="notifChbx" class="js-process-chbx" checked="checked" data-id="notif" />
-	<label for="notifChbx">Notification</label>
-
-
-	<input type="checkbox" id="respoChbx" class="js-process-chbx" checked="checked" data-id="respo" />
-	<label for="respoChbx">Response</label>
-
-
-	<input type="checkbox" id="instrChbx" class="js-process-chbx" checked="checked" data-id="instr" />
-	<label for="instrChbx">Instruction</label>
-
-
-	<input type="checkbox" id="paymeChbx" class="js-process-chbx" checked="checked" data-id="payme" />
-	<label for="paymeChbx">Payment</label>
-
-	<br />
-</div>
-
 <script type="text/javascript">
 
-	$(function() {
+	$(function () {
 		var notif = $.connection.NotificationHub;
 
-		notif.client.update = function (data) {
-			update(data);
+		notif.client.updateProcess = function (data) {
+			var process = ko.utils.arrayFirst(viewModel.processes(), function (proc) {
+				return proc.id === data.id;
+			});
+
+			if (process) {
+				viewModel.processes.replace(process, new Process(data.id, data.title, data.targetDateItems, data.criticalDateItems));
+			}
 		};
 
 		$.connection.hub.start();
 	}());
-
-	function update(data) {
-		var processes = [],
-			process,
-			i;
-
-		for (i = 0; i < data.length; i++) {
-			process = data[i];
-			processes.push(new Process(process.id, process.title, process.targetDateItems, process.criticalDateItems));
-		}
-
-		viewModel.processes(processes);
-	}
 
 	function Process(id, title, targetDateItems, criticalDateItems) {
 		this.id = id;
@@ -101,9 +69,4 @@
 	var data = [];
 	var options = {};
 	var timeline = new vis.Timeline(container, data, options);
-
-	$(".js-process-chbx").click(function () {
-		var processId = "#" + $(this).data("id");
-		$(processId).toggle();
-	});
 </script>

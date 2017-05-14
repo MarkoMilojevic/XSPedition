@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Web.Entities.Shared;
 
 namespace Web.Entities.Lookups
 {
@@ -8,7 +9,7 @@ namespace Web.Entities.Lookups
 		public int ProcessTypeLookupId { get; set; }
 
 		[Required]
-		public string Code { get; set; }
+		public ProcessType Type { get; set; }
 
 		[Required]
 		public string Display { get; set; }

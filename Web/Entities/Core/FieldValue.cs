@@ -11,10 +11,7 @@ namespace Web.Entities.Core
 		
 		[Required]
 		public int FieldLookupId { get; set; }
-
-		[Required]
-		public string Value { get; set; }
-
+		
 		public bool IsScrubbed { get; set; }
 
 		public int? CaId { get; set; }

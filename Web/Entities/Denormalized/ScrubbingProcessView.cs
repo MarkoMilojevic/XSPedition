@@ -14,6 +14,8 @@ namespace Web.Entities.Denormalized
 
 		public int? PayoutId { get; set; }
 
+		public int? FieldLookupId { get; set; }
+		
 		public string FieldDisplay { get; set; }
 
 		public ProcessedDateCategory ProcessedDateCategory { get; set; }

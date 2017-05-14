@@ -183,7 +183,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Entities\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -220,7 +219,10 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\SignalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\EventsController.cs" />
+    <Compile Include="DTO\CaEvent.cs" />
+    <Compile Include="DTO\Process.cs" />
+    <Compile Include="Entities\Shared\ProcessType.cs" />
     <Compile Include="Entities\System\DatesConfiguration.cs" />
     <Compile Include="Entities\Core\Account.cs" />
     <Compile Include="Entities\Core\Balance.cs" />
@@ -275,9 +277,23 @@
     <Compile Include="Migrations\201705140016069_AddDenormilizedViewsAndEventLog.Designer.cs">
       <DependentUpon>201705140016069_AddDenormilizedViewsAndEventLog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705141626374_AlterProcessTypeCodeToEnum.cs" />
+    <Compile Include="Migrations\201705141626374_AlterProcessTypeCodeToEnum.Designer.cs">
+      <DependentUpon>201705141626374_AlterProcessTypeCodeToEnum.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705141708170_AddFieldLookupIdToScrubbingView.cs" />
+    <Compile Include="Migrations\201705141708170_AddFieldLookupIdToScrubbingView.Designer.cs">
+      <DependentUpon>201705141708170_AddFieldLookupIdToScrubbingView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705141753343_RemoveFieldValue.cs" />
+    <Compile Include="Migrations\201705141753343_RemoveFieldValue.Designer.cs">
+      <DependentUpon>201705141753343_RemoveFieldValue.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Shared\ProcessedDateCategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\ApiHttpClient.cs" />
+    <Compile Include="Service\ApiService.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -353,7 +369,7 @@
     <Content Include="lib\vis-4.19.1\misc\we_need_help.md" />
     <Content Include="lib\vis-4.19.1\package.json" />
     <Content Include="lib\vis-4.19.1\README.md" />
-	<None Include="Properties\PublishProfiles\xspedition - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\xspedition - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.1.1.intellisense.js" />
     <Content Include="lib\vis-4.19.1\.gitignore" />
     <Content Include="lib\vis-4.19.1\dist\img\network\acceptDeleteIcon.png" />
@@ -933,6 +949,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705140016069_AddDenormilizedViewsAndEventLog.resx">
       <DependentUpon>201705140016069_AddDenormilizedViewsAndEventLog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705141626374_AlterProcessTypeCodeToEnum.resx">
+      <DependentUpon>201705141626374_AlterProcessTypeCodeToEnum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705141708170_AddFieldLookupIdToScrubbingView.resx">
+      <DependentUpon>201705141708170_AddFieldLookupIdToScrubbingView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705141753343_RemoveFieldValue.resx">
+      <DependentUpon>201705141753343_RemoveFieldValue.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
