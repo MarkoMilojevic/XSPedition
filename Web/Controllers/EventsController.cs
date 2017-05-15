@@ -111,16 +111,14 @@ namespace Web.Controllers
 		}
 		private CaProcess ReadScrubbingReadStore(int caId)
 		{
-			CaProcess result = new CaProcess();
+            List<ScrubbingProcessView> scrubbingViews = _context.ScrubbingProcessViews.Where(cpv => cpv.CaId == caId).ToList();
+            
+			var targetDateItems = scrubbingViews.Where(spv => spv.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+			var criticalDateItems = scrubbingViews.Where(spv => spv.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            var processedItemCount = scrubbingViews.Count(spv => spv.IsSrubbed);
+            var totalItemCount = scrubbingViews.Count;
 
-			List<ScrubbingProcessView> scrubbingViews = _context.ScrubbingProcessViews.Where(cpv => cpv.CaId == caId).ToList();
-
-			result.id = "scrub";
-			result.title = _context.ProcessTypeLookups.Single(pt => pt.Type == ProcessType.Scrubbing).Display;
-			result.targetDateItems = scrubbingViews.Where(spv => spv.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
-			result.criticalDateItems = scrubbingViews.Where(spv => spv.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
-
-			return result;
+            return new CaProcess(ProcessType.Scrubbing, targetDateItems, criticalDateItems, processedItemCount, totalItemCount);
 		}
 
 		#endregion SCRUBBING

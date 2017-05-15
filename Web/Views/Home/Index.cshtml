@@ -16,12 +16,15 @@
 			</ul>
 		</div>
 
-		<div class="process-item justified">
-			<div class="text-bold">Critical date:</div>
-			<ul data-bind="foreach: criticalDateItems()">
-				<li data-bind="text: $data"></li>
-			</ul>
-		</div>
+	    <div class="process-item justified">
+	        <div class="text-bold">Critical date:</div>
+	        <ul data-bind="foreach: criticalDateItems()">
+	            <li data-bind="text: $data"></li>
+	        </ul>
+	    </div>
+	    <div class="justified" data-bind="text: processProgressLabel">
+	        
+	    </div>
 	</div>
 </div>
 
@@ -36,18 +39,26 @@
 			});
 
 			if (process) {
-				viewModel.processes.replace(process, new Process(data.id, data.title, data.targetDateItems, data.criticalDateItems));
+			    viewModel.processes.replace(process, new Process(data.id, data.title, data.targetDateItems, data.criticalDateItems, data.processActionName, data.totalItemCount, data.processedItemCount, data.processPercentage));
 			}
 		};
 
 		$.connection.hub.start();
 	}());
 
-	function Process(id, title, targetDateItems, criticalDateItems) {
+	function Process(id, title, targetDateItems, criticalDateItems, processActionName, totalItemCount, processedItemCount, processPercentage) {
 		this.id = id;
 		this.title = title;
 		this.targetDateItems = ko.observableArray(targetDateItems);
 		this.criticalDateItems = ko.observableArray(criticalDateItems);
+		this.processActionName = ko.observable(processActionName);
+		this.totalItemCount = ko.observable(totalItemCount ? totalItemCount : 0);
+		this.processedItemCount = ko.observable(processedItemCount ? processedItemCount : 0);
+		this.processPercentage = ko.observable(typeof processPercentage === "undefined" ? 100 : processPercentage);
+
+	    this.processProgressLabel = ko.computed(function() {
+	        return this.processActionName() + ": " + this.processedItemCount() + "/" + this.totalItemCount() + " (" + this.processPercentage().toFixed(2) + "%)";
+	    }, this);
 	}
 
 	function AppViewModel() {
@@ -56,11 +67,11 @@
 
 	var viewModel = new AppViewModel();
 	viewModel.processes([
-		new Process("scrub", "CA Scrubbing", [], []),
-		new Process("notif", "Notification", [], []),
-		new Process("respo", "Response", [], []),
-		new Process("instr", "Instruction", [], []),
-		new Process("payme", "Payment", [], [])
+		new Process("scrub", "CA Scrubbing", [], [], "Scrubbed"),
+		new Process("notif", "Notification", [], [], "Sent"),
+		new Process("respo", "Response", [], [], "Submitted"),
+		new Process("instr", "Instruction", [], [], "Instructed"),
+		new Process("payme", "Payment", [], [], "Settled")
 	]);
 
 	ko.applyBindings(viewModel);
