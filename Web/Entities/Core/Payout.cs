@@ -16,7 +16,7 @@ namespace Web.Entities.Core
 		public int PayoutTypeLookupId { get; set; }
 
 		[Required]
-		public string PayoutNumber { get; set; }
+		public int PayoutNumber { get; set; }
 
 		[ForeignKey(nameof(Payout.PayoutTypeLookupId))]
 		public PayoutTypeLookup PayoutTypeLookup { get; set; }

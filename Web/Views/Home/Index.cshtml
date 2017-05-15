@@ -1,83 +1,83 @@
 ﻿<div class="text-center">
-	<h1>Corporate Action Lifecycle</h1>
+    <h1>Corporate Action Lifecycle</h1>
 </div>
 
 <div id="timeline" class="outlined"></div>
 
 <div data-bind="foreach: processes" class="processes-container outlined">
-	<div data-bind="attr: { id: id }" class="processes-item process-container outlined">
+    <div data-bind="attr: { id: id }" class="processes-item process-container outlined">
 
-		<h4 data-bind="text: title" class="justified"></h4>
+        <h4 data-bind="text: title" class="justified"></h4>
 
-		<div class="process-item justified">
-			<div class="text-bold">Target date:</div>
-			<ul data-bind="foreach: targetDateItems()">
-				<li data-bind="text: $data"></li>
-			</ul>
-		</div>
+        <div class="process-item justified">
+            <div class="text-bold">Target date:</div>
+            <ul data-bind="foreach: targetDateItems">
+                <li data-bind="text: $data"></li>
+            </ul>
+        </div>
 
-	    <div class="process-item justified">
-	        <div class="text-bold">Critical date:</div>
-	        <ul data-bind="foreach: criticalDateItems()">
-	            <li data-bind="text: $data"></li>
-	        </ul>
-	    </div>
-	    <div class="justified" data-bind="text: processProgressLabel">
-	        
-	    </div>
-	</div>
+        <div class="process-item justified">
+            <div class="text-bold">Critical date:</div>
+            <ul data-bind="foreach: criticalDateItems">
+                <li data-bind="text: $data"></li>
+            </ul>
+        </div>
+        <div class="justified" data-bind="text: processProgressLabel">
+
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
 
-	$(function () {
-		var notif = $.connection.NotificationHub;
+    $(function () {
+        var notif = $.connection.NotificationHub;
 
-		notif.client.updateProcess = function (data) {
-			var process = ko.utils.arrayFirst(viewModel.processes(), function (proc) {
-				return proc.id === data.id;
-			});
+        notif.client.updateProcess = function (data) {
+            var process = ko.utils.arrayFirst(viewModel.processes(), function (proc) {
+                return proc.id === data.id;
+            });
 
-			if (process) {
-			    viewModel.processes.replace(process, new Process(data.id, data.title, data.targetDateItems, data.criticalDateItems, data.processActionName, data.totalItemCount, data.processedItemCount, data.processPercentage));
-			}
-		};
+            if (process) {
+                viewModel.processes.replace(process, new Process(data.id, data.title, data.targetDateItems, data.criticalDateItems, data.processActionName, data.totalItemCount, data.processedItemCount, data.processPercentage));
+            }
+        };
 
-		$.connection.hub.start();
-	}());
+        $.connection.hub.start();
+    }());
 
-	function Process(id, title, targetDateItems, criticalDateItems, processActionName, totalItemCount, processedItemCount, processPercentage) {
-		this.id = id;
-		this.title = title;
-		this.targetDateItems = ko.observableArray(targetDateItems);
-		this.criticalDateItems = ko.observableArray(criticalDateItems);
-		this.processActionName = ko.observable(processActionName);
-		this.totalItemCount = ko.observable(totalItemCount ? totalItemCount : 0);
-		this.processedItemCount = ko.observable(processedItemCount ? processedItemCount : 0);
-		this.processPercentage = ko.observable(typeof processPercentage === "undefined" ? 100 : processPercentage);
+    function Process(id, title, targetDateItems, criticalDateItems, processActionName, totalItemCount, processedItemCount, processPercentage) {
+        this.id = id;
+        this.title = title;
+        this.targetDateItems = targetDateItems;
+        this.criticalDateItems = criticalDateItems;
+        this.processActionName = processActionName;
+        this.totalItemCount = totalItemCount ? totalItemCount : 0;
+        this.processedItemCount = processedItemCount ? processedItemCount : 0;
+        this.processPercentage = typeof processPercentage === "undefined" ? 100 : processPercentage;
 
-	    this.processProgressLabel = ko.computed(function() {
-	        return this.processActionName() + ": " + this.processedItemCount() + "/" + this.totalItemCount() + " (" + this.processPercentage().toFixed(2) + "%)";
-	    }, this);
-	}
+        this.processProgressLabel = ko.pureComputed(function () {
+            return this.processActionName + ": " + this.processedItemCount + "/" + this.totalItemCount + " (" + this.processPercentage.toFixed(2) + "%)";
+        }, this);
+    }
 
-	function AppViewModel() {
-		this.processes = ko.observableArray();
-	}
+    function AppViewModel() {
+        this.processes = ko.observableArray();
+    }
 
-	var viewModel = new AppViewModel();
-	viewModel.processes([
+    var viewModel = new AppViewModel();
+    viewModel.processes([
 		new Process("scrub", "CA Scrubbing", [], [], "Scrubbed"),
 		new Process("notif", "Notification", [], [], "Sent"),
 		new Process("respo", "Response", [], [], "Submitted"),
 		new Process("instr", "Instruction", [], [], "Instructed"),
 		new Process("payme", "Payment", [], [], "Settled")
-	]);
+    ]);
 
-	ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel);
 
-	var container = document.getElementById("timeline");
-	var data = [];
-	var options = {};
-	var timeline = new vis.Timeline(container, data, options);
+    var container = document.getElementById("timeline");
+    var data = [];
+    var options = {};
+    var timeline = new vis.Timeline(container, data, options);
 </script>

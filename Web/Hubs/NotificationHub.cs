@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
@@ -8,59 +9,65 @@ using Web.Service;
 
 namespace Web.Hubs
 {
-	[HubName("NotificationHub")]
-	public class NotificationHub: Hub
-	{
-		private readonly ApiService _apiService;
+    [HubName("NotificationHub")]
+    public class NotificationHub : Hub
+    {
+        private readonly ApiService _apiService;
 
-		public NotificationHub()
-		{
-			_apiService = new ApiService();
-		}
+        public NotificationHub()
+        {
+            _apiService = new ApiService();
+        }
 
-		public void StartSimulation()
-		{
-			const int sleepTime = 1000;
+        public void StartSimulation()
+        {
+            const int sleepTime = 1000;
 
-			CaEvent event1 = new CaEvent
-			{
-				CaId = 1,
-				ProcessTypeId = (int) ProcessType.Scrubbing,
-				Date = DateTime.Now,
-				TargetId = 1,
-				IsProcessed = true
-			};
+            ScrubbingEventDto @event = CreateFirstCAScrubbingEvent();
+            CaProcess data = _apiService.HandleEvent(@event);
+            Clients.All.updateProcess(data);
+            Thread.Sleep(sleepTime);
+        }
 
-
-			CaProcess data = _apiService.HandleEvent(event1);
-			Clients.All.updateProcess(data);
-			Thread.Sleep(sleepTime);
-
-			CaEvent event2 = new CaEvent
-			{
-				CaId = 1,
-				ProcessTypeId = (int)ProcessType.Scrubbing,
-				Date = DateTime.Now,
-				TargetId = 1,
-				IsProcessed = false
-			};
-
-			data = _apiService.HandleEvent(event2);
-			Clients.All.updateProcess(data);
-			Thread.Sleep(sleepTime);
-
-			CaEvent event3 = new CaEvent
-			{
-				CaId = 1,
-				ProcessTypeId = (int)ProcessType.Scrubbing,
-				Date = DateTime.Now,
-				TargetId = 1,
-				IsProcessed = true
-			};
-
-			data = _apiService.HandleEvent(event3);
-			Clients.All.updateProcess(data);
-			Thread.Sleep(sleepTime);
-		}
-	}
+        private ScrubbingEventDto CreateFirstCAScrubbingEvent()
+        {
+            return new ScrubbingEventDto
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                EventDate = DateTime.Now,
+                Fields = new Dictionary<int, string>
+                {
+                    { 1, "05/01/2017" },
+                    { 2, "05/15/2017" }
+                },
+                Options = new List<OptionDto>
+                {
+                    new OptionDto
+                    {
+                        OptionNumber = 1,
+                        OptionTypeId = 1,
+                        Fields = new Dictionary<int, string>
+                        {
+                            { 1, "05/05/2017" },
+                            { 2, null }
+                        },
+                        Payouts = new List<PayoutDto>
+                        {
+                            new PayoutDto
+                            {
+                                PayoutNumber = 1,
+                                PayoutTypeId = 1,
+                                Fields = new Dictionary<int, string>
+                                {
+                                    { 1, "07/01/2017" },
+                                    { 2, null }
+                                },
+                            }
+                        }
+                    }
+                }
+            };
+        }
+    }
 }

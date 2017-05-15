@@ -17,7 +17,7 @@ namespace Web.Entities.Core
 		public int OptionTypeLookupId { get; set; }
 
 		[Required]
-		public string OptionNumber { get; set; }
+		public int OptionNumber { get; set; }
 
 		[ForeignKey(nameof(Option.OptionTypeLookupId))]
 		public OptionTypeLookup OptionTypeLookup { get; set; }
