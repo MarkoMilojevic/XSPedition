@@ -11,6 +11,8 @@ namespace Web.Entities.Core
 		
 		[Required]
 		public int FieldLookupId { get; set; }
+
+		public string Value { get; set; }
 		
 		public bool IsScrubbed { get; set; }
 
@@ -22,5 +24,6 @@ namespace Web.Entities.Core
 
 		[ForeignKey(nameof(FieldValue.FieldLookupId))]
 		public virtual FieldLookup FieldLookup { get; set; }
+
 	}
 }

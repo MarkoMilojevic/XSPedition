@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using Web.Entities.Shared;
 
-namespace Web.DTO
+namespace Web.ViewModels
 {
-	public class CaProcess
+	public class CaProcessViewModel
 	{
-	    public CaProcess(ProcessType processType, List<string> targetDateItems, List<string> criticalDateItems, int processedItemCount, int totalItemCount)
+	    public CaProcessViewModel(ProcessType processType, List<string> targetDateItems, List<string> criticalDateItems, int processedItemCount, int totalItemCount)
 	    {
 	        switch (processType)
 	        {

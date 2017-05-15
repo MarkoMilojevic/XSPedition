@@ -220,9 +220,9 @@
     <Compile Include="Controllers\SignalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\EventsController.cs" />
-    <Compile Include="DTO\EventDto.cs" />
-    <Compile Include="DTO\Process.cs" />
-    <Compile Include="DTO\ScrubbingEventDto.cs" />
+    <Compile Include="DTO\CaScrubbedEvent.cs" />
+    <Compile Include="DTO\Command.cs" />
+    <Compile Include="DTO\ScrubCaCommand.cs" />
     <Compile Include="Entities\Shared\ProcessType.cs" />
     <Compile Include="Entities\System\DatesConfiguration.cs" />
     <Compile Include="Entities\Core\Account.cs" />
@@ -290,12 +290,21 @@
     <Compile Include="Migrations\201705141753343_RemoveFieldValue.Designer.cs">
       <DependentUpon>201705141753343_RemoveFieldValue.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705152217502_NeZnamStaSamRadio.cs" />
+    <Compile Include="Migrations\201705152217502_NeZnamStaSamRadio.Designer.cs">
+      <DependentUpon>201705152217502_NeZnamStaSamRadio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705152303598_NeZnamStaSamRadio2.cs" />
+    <Compile Include="Migrations\201705152303598_NeZnamStaSamRadio2.Designer.cs">
+      <DependentUpon>201705152303598_NeZnamStaSamRadio2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Shared\ProcessedDateCategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\ApiHttpClient.cs" />
     <Compile Include="Service\ApiService.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\CaProcessViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
@@ -959,6 +968,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705141753343_RemoveFieldValue.resx">
       <DependentUpon>201705141753343_RemoveFieldValue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705152217502_NeZnamStaSamRadio.resx">
+      <DependentUpon>201705152217502_NeZnamStaSamRadio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705152303598_NeZnamStaSamRadio2.resx">
+      <DependentUpon>201705152303598_NeZnamStaSamRadio2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

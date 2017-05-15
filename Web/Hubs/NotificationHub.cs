@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR.Hubs;
 using Web.DTO;
 using Web.Entities.Shared;
 using Web.Service;
+using Web.ViewModels;
 
 namespace Web.Hubs
 {
@@ -23,17 +24,20 @@ namespace Web.Hubs
         {
             const int sleepTime = 1000;
 
-            ScrubbingEventDto @event = CreateFirstCAScrubbingEvent();
-            CaProcess data = _apiService.HandleEvent(@event);
-            Clients.All.updateProcess(data);
-            Thread.Sleep(sleepTime);
-        }
+            ScrubCaCommand command = CreateFirstCAScrubbingEvent();
+            CaProcessViewModel viewModel = _apiService.Execute(command);
+	        if (viewModel != null)
+	        {
+				Clients.All.updateProcess(viewModel);
+				Thread.Sleep(sleepTime);
+	        }
+		}
 
-        private ScrubbingEventDto CreateFirstCAScrubbingEvent()
+        private ScrubCaCommand CreateFirstCAScrubbingEvent()
         {
-            return new ScrubbingEventDto
+            return new ScrubCaCommand
             {
-                CaId = 1,
+                CaId = 2,
                 CaTypeId = 1,
                 EventDate = DateTime.Now,
                 Fields = new Dictionary<int, string>
@@ -49,8 +53,8 @@ namespace Web.Hubs
                         OptionTypeId = 1,
                         Fields = new Dictionary<int, string>
                         {
-                            { 1, "05/05/2017" },
-                            { 2, null }
+                            { 3, "05/05/2017" },
+                            { 4, null }
                         },
                         Payouts = new List<PayoutDto>
                         {
@@ -60,8 +64,8 @@ namespace Web.Hubs
                                 PayoutTypeId = 1,
                                 Fields = new Dictionary<int, string>
                                 {
-                                    { 1, "07/01/2017" },
-                                    { 2, null }
+                                    { 5, "07/01/2017" },
+                                    { 6, null }
                                 },
                             }
                         }

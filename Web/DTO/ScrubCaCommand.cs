@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Web.DTO
 {
-    public class ScrubbingEventDto : EventDto
+    public class ScrubCaCommand : Command
     {
         public int CaId { get; set; }
 
@@ -15,7 +15,7 @@ namespace Web.DTO
 
         public List<OptionDto> Options { get; set; }
 
-        public ScrubbingEventDto()
+        public ScrubCaCommand()
         {
             this.Fields = new Dictionary<int, string>();
             this.Options = new List<OptionDto>();
