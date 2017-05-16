@@ -56,8 +56,8 @@ namespace Web.Migrations
 				}
 			);
 
-	        context.ScrubbingProcessViews.AddOrUpdate(spv => spv.ScrubbingProcessViewId, 
-				new ScrubbingProcessView
+	        context.Scrubbing.AddOrUpdate(spv => spv.ScrubbingProcessViewId, 
+				new Scrubbing
 				{
 					ScrubbingProcessViewId = 1,
 					CaId = 1,

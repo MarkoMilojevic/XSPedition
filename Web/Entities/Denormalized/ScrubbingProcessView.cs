@@ -3,7 +3,7 @@ using Web.Models.Shared;
 
 namespace Web.Entities.Denormalized
 {
-	public class ScrubbingProcessView
+	public class Scrubbing
 	{
 		[Key]
 		public int ScrubbingProcessViewId { get; set; }

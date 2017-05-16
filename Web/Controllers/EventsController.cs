@@ -215,11 +215,11 @@ namespace Web.Controllers
 				// CREATE CA TIMELINE VIEW
 			}
 
-			List<ScrubbingProcessView> scrubbingViews = _context.ScrubbingProcessViews.Where(view => view.CaId == @event.CaId).ToList();
+			List<Scrubbing> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == @event.CaId).ToList();
 			if (scrubbingViews.Count == 0)
 			{
 				List<FieldValue> fields = _context.FieldValues.Where(fld => fld.CaId == ca.CaId).ToList();
-				_context.ScrubbingProcessViews.AddRange(fields.Select(fld => new ScrubbingProcessView
+				_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
 				{
 					CaId = ca.CaId,
 					FieldLookupId = fld.FieldLookup.FieldLookupId,
@@ -231,7 +231,7 @@ namespace Web.Controllers
 				foreach (Option option in ca.Options)
 				{
 					fields = _context.FieldValues.Where(fld => fld.OptionId == option.OptionId).ToList();
-					_context.ScrubbingProcessViews.AddRange(fields.Select(fld => new ScrubbingProcessView
+					_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
 					{
 						OptionId = option.OptionId,
 						FieldLookupId = fld.FieldLookup.FieldLookupId,
@@ -243,7 +243,7 @@ namespace Web.Controllers
 					foreach (Payout payout in option.Payouts)
 					{
 						fields = _context.FieldValues.Where(fld => fld.PayoutId == payout.PayoutId).ToList();
-						_context.ScrubbingProcessViews.AddRange(fields.Select(fld => new ScrubbingProcessView
+						_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
 						{
 							PayoutId = payout.PayoutId,
 							FieldLookupId = fld.FieldLookup.FieldLookupId,
@@ -269,11 +269,11 @@ namespace Web.Controllers
 
 			foreach (FieldValue field in flds)
 			{
-				ScrubbingProcessView view;
+				Scrubbing view;
 
 				if (field.CaId != null)
 				{
-					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.CaId == @event.CaId).ToList();
+					scrubbingViews = _context.Scrubbing.Where(v => v.CaId == @event.CaId).ToList();
 					view = scrubbingViews.Single(v => v.CaId == field.CaId && v.FieldLookupId == field.FieldLookupId);
 					if (view != null && view.IsSrubbed == false)
 					{
@@ -285,7 +285,7 @@ namespace Web.Controllers
 
 				if (field.OptionId != null)
 				{
-					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.OptionId == field.OptionId).ToList();
+					scrubbingViews = _context.Scrubbing.Where(v => v.OptionId == field.OptionId).ToList();
 					view = scrubbingViews.Single(v => v.OptionId == field.OptionId && v.FieldLookupId == field.FieldLookupId);
 					if (view != null && view.IsSrubbed == false)
 					{
@@ -297,7 +297,7 @@ namespace Web.Controllers
 
 				if (field.PayoutId != null)
 				{
-					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.PayoutId == field.PayoutId).ToList();
+					scrubbingViews = _context.Scrubbing.Where(v => v.PayoutId == field.PayoutId).ToList();
 					view = scrubbingViews.Single(v => v.PayoutId == field.PayoutId && v.FieldLookupId == field.FieldLookupId);
 					if (view != null && view.IsSrubbed == false)
 					{
@@ -318,13 +318,13 @@ namespace Web.Controllers
 		public IHttpActionResult GetScrubbing(int caId)
 		{
 			CorporateAction ca = _context.CorporateActions.Single(c => c.CaId == caId);
-			List<ScrubbingProcessView> scrubbingViews = _context.ScrubbingProcessViews.Where(view => view.CaId == caId).ToList();
+			List<Scrubbing> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == caId).ToList();
 			foreach (Option option in ca.Options)
 			{
-				scrubbingViews.AddRange(_context.ScrubbingProcessViews.Where(view => view.OptionId == option.OptionId));
+				scrubbingViews.AddRange(_context.Scrubbing.Where(view => view.OptionId == option.OptionId));
 				foreach (Payout payout in option.Payouts)
 				{
-					scrubbingViews.AddRange(_context.ScrubbingProcessViews.Where(view => view.PayoutId == payout.PayoutId));
+					scrubbingViews.AddRange(_context.Scrubbing.Where(view => view.PayoutId == payout.PayoutId));
 				}
 			}
 
