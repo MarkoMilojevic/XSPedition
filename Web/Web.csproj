@@ -257,6 +257,10 @@
     <Compile Include="Migrations\201705161018319_ResetDDL.Designer.cs">
       <DependentUpon>201705161018319_ResetDDL.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705161453553_ChangeScrubbingTable.cs" />
+    <Compile Include="Migrations\201705161453553_ChangeScrubbingTable.Designer.cs">
+      <DependentUpon>201705161453553_ChangeScrubbingTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Shared\ProcessedDateCategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -865,6 +869,7 @@
     <Content Include="lib\vis-4.19.1\test\TimelineRange.test.js" />
     <Content Include="lib\vis-4.19.1\test\timeline_groups.html" />
     <Content Include="lib\vis-4.19.1\test\timestep.html" />
+    <Content Include="Migrations\seed.sql" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
@@ -906,6 +911,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201705161018319_ResetDDL.resx">
       <DependentUpon>201705161018319_ResetDDL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705161453553_ChangeScrubbingTable.resx">
+      <DependentUpon>201705161453553_ChangeScrubbingTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
