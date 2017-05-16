@@ -107,3 +107,26 @@ SET IDENTITY_INSERT FieldRegistry OFF
 --     VALUES
 --			(<PayoutTypeRegistryId, int,>,<FieldRegistryId, int,>),
 --			(<PayoutTypeRegistryId, int,>,<FieldRegistryId, int,>)
+
+
+--Insert Field Mappings
+INSERT INTO [dbo].[CaTypeFieldMap]
+			([CaTypeRegistryId],[FieldRegistryId])
+     VALUES
+			(1, 1),
+			(1, 4)
+
+--Option polja po OPTION TIPOVIMA
+INSERT INTO [dbo].[OptionTypeFieldMap]
+			([OptionTypeRegistryId],[FieldRegistryId])
+     VALUES
+			(1,101),
+			(1,103)
+
+--Payout polja po PAYOUT TIPOVIMA
+INSERT INTO [dbo].[PayoutTypeFieldMap]
+			([PayoutTypeRegistryId],[FieldRegistryId])
+     VALUES
+			(1,1009),
+			(1,1010),
+			(1,1012)

@@ -36,13 +36,13 @@ namespace Web.Hubs
         {
             return new ScrubCaCommand
             {
-                CaId = 2,
+                CaId = 1,
                 CaTypeId = 1,
                 EventDate = DateTime.Now,
                 Fields = new Dictionary<int, string>
                 {
                     { 1, "05/01/2017" },
-                    { 2, "05/15/2017" }
+                    { 4, "05/15/2017" }
                 },
                 Options = new List<OptionDto>
                 {
@@ -52,8 +52,8 @@ namespace Web.Hubs
                         OptionTypeId = 1,
                         Fields = new Dictionary<int, string>
                         {
-                            { 3, "05/05/2017" },
-                            { 4, null }
+                            { 101, "05/05/2017" },
+                            { 103, null }
                         },
                         Payouts = new List<PayoutDto>
                         {
