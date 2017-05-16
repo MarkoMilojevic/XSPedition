@@ -223,6 +223,9 @@
     <Compile Include="DTO\CaScrubbedEvent.cs" />
     <Compile Include="DTO\Command.cs" />
     <Compile Include="DTO\ScrubCaCommand.cs" />
+    <Compile Include="Entities\Registries\Maps\CaTypeFieldMap.cs" />
+    <Compile Include="Entities\Registries\Maps\OptionTypeFieldMap.cs" />
+    <Compile Include="Entities\Registries\Maps\PayoutTypeFieldMap.cs" />
     <Compile Include="Entities\Shared\ProcessType.cs" />
     <Compile Include="Entities\System\DatesConfiguration.cs" />
     <Compile Include="Entities\Core\Account.cs" />
@@ -239,64 +242,20 @@
     <Compile Include="Entities\Denormalized\InstructionProcessView.cs" />
     <Compile Include="Entities\Denormalized\ResponseProcessView.cs" />
     <Compile Include="Entities\Denormalized\ScrubbingProcessView.cs" />
-    <Compile Include="Entities\Lookups\CaTypeLookup.cs" />
-    <Compile Include="Entities\Lookups\FieldLookup.cs" />
-    <Compile Include="Entities\Lookups\OptionTypeLookup.cs" />
-    <Compile Include="Entities\Lookups\PayoutTypeLookup.cs" />
-    <Compile Include="Entities\Lookups\ProcessTypeLookup.cs" />
+    <Compile Include="Entities\Registries\CaTypeRegistry.cs" />
+    <Compile Include="Entities\Registries\FieldRegistry.cs" />
+    <Compile Include="Entities\Registries\OptionTypeRegistry.cs" />
+    <Compile Include="Entities\Registries\PayoutTypeRegistry.cs" />
+    <Compile Include="Entities\Registries\ProcessTypeRegistry.cs" />
     <Compile Include="Entities\System\EventLog.cs" />
     <Compile Include="Entities\XspDbContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\NotificationHub.cs" />
-    <Compile Include="Migrations\201705131943103_CreateEntityTypes.cs" />
-    <Compile Include="Migrations\201705131943103_CreateEntityTypes.Designer.cs">
-      <DependentUpon>201705131943103_CreateEntityTypes.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705131949470_SetDefaultConnection.cs" />
-    <Compile Include="Migrations\201705131949470_SetDefaultConnection.Designer.cs">
-      <DependentUpon>201705131949470_SetDefaultConnection.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705132001432_RefactorLookupTables.cs" />
-    <Compile Include="Migrations\201705132001432_RefactorLookupTables.Designer.cs">
-      <DependentUpon>201705132001432_RefactorLookupTables.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705132012476_AddFieldValues.cs" />
-    <Compile Include="Migrations\201705132012476_AddFieldValues.Designer.cs">
-      <DependentUpon>201705132012476_AddFieldValues.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705132022439_AddOptionsAndPayouts.cs" />
-    <Compile Include="Migrations\201705132022439_AddOptionsAndPayouts.Designer.cs">
-      <DependentUpon>201705132022439_AddOptionsAndPayouts.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705132247050_AddCoreEntitiesForSettlement.cs" />
-    <Compile Include="Migrations\201705132247050_AddCoreEntitiesForSettlement.Designer.cs">
-      <DependentUpon>201705132247050_AddCoreEntitiesForSettlement.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705140016069_AddDenormilizedViewsAndEventLog.cs" />
-    <Compile Include="Migrations\201705140016069_AddDenormilizedViewsAndEventLog.Designer.cs">
-      <DependentUpon>201705140016069_AddDenormilizedViewsAndEventLog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705141626374_AlterProcessTypeCodeToEnum.cs" />
-    <Compile Include="Migrations\201705141626374_AlterProcessTypeCodeToEnum.Designer.cs">
-      <DependentUpon>201705141626374_AlterProcessTypeCodeToEnum.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705141708170_AddFieldLookupIdToScrubbingView.cs" />
-    <Compile Include="Migrations\201705141708170_AddFieldLookupIdToScrubbingView.Designer.cs">
-      <DependentUpon>201705141708170_AddFieldLookupIdToScrubbingView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705141753343_RemoveFieldValue.cs" />
-    <Compile Include="Migrations\201705141753343_RemoveFieldValue.Designer.cs">
-      <DependentUpon>201705141753343_RemoveFieldValue.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705152217502_NeZnamStaSamRadio.cs" />
-    <Compile Include="Migrations\201705152217502_NeZnamStaSamRadio.Designer.cs">
-      <DependentUpon>201705152217502_NeZnamStaSamRadio.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705152303598_NeZnamStaSamRadio2.cs" />
-    <Compile Include="Migrations\201705152303598_NeZnamStaSamRadio2.Designer.cs">
-      <DependentUpon>201705152303598_NeZnamStaSamRadio2.cs</DependentUpon>
+    <Compile Include="Migrations\201705161018319_ResetDDL.cs" />
+    <Compile Include="Migrations\201705161018319_ResetDDL.Designer.cs">
+      <DependentUpon>201705161018319_ResetDDL.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Shared\ProcessedDateCategory.cs" />
@@ -939,48 +898,15 @@
     <Content Include="Views\Signal\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201705131943103_CreateEntityTypes.resx">
-      <DependentUpon>201705131943103_CreateEntityTypes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705131949470_SetDefaultConnection.resx">
-      <DependentUpon>201705131949470_SetDefaultConnection.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705132001432_RefactorLookupTables.resx">
-      <DependentUpon>201705132001432_RefactorLookupTables.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705132012476_AddFieldValues.resx">
-      <DependentUpon>201705132012476_AddFieldValues.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705132022439_AddOptionsAndPayouts.resx">
-      <DependentUpon>201705132022439_AddOptionsAndPayouts.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705132247050_AddCoreEntitiesForSettlement.resx">
-      <DependentUpon>201705132247050_AddCoreEntitiesForSettlement.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705140016069_AddDenormilizedViewsAndEventLog.resx">
-      <DependentUpon>201705140016069_AddDenormilizedViewsAndEventLog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705141626374_AlterProcessTypeCodeToEnum.resx">
-      <DependentUpon>201705141626374_AlterProcessTypeCodeToEnum.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705141708170_AddFieldLookupIdToScrubbingView.resx">
-      <DependentUpon>201705141708170_AddFieldLookupIdToScrubbingView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705141753343_RemoveFieldValue.resx">
-      <DependentUpon>201705141753343_RemoveFieldValue.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705152217502_NeZnamStaSamRadio.resx">
-      <DependentUpon>201705152217502_NeZnamStaSamRadio.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705152303598_NeZnamStaSamRadio2.resx">
-      <DependentUpon>201705152303598_NeZnamStaSamRadio2.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201705161018319_ResetDDL.resx">
+      <DependentUpon>201705161018319_ResetDDL.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

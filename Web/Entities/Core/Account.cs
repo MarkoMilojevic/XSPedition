@@ -14,6 +14,9 @@ namespace Web.Entities.Core
 		[Required]
 		public string AccountOwner { get; set; }
 
-		public virtual List<Balance> Balances { get; set; }
+        [Required]
+        public string BusinessEntity { get; set; }
+
+        public virtual List<Balance> Balances { get; set; }
 	}
 }

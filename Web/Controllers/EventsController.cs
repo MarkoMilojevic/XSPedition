@@ -7,7 +7,7 @@ using Web.DTO;
 using Web.Entities;
 using Web.Entities.Core;
 using Web.Entities.Denormalized;
-using Web.Entities.Lookups;
+using Web.Entities.Registries;
 using Web.Entities.Shared;
 using Web.Models.Shared;
 using Web.ViewModels;
@@ -22,7 +22,7 @@ namespace Web.Controllers
 		{
 			_context = new XspDbContext();
 		}
-
+        
 		#region SCRUBBING
 
 		#region COMMAND
@@ -56,7 +56,7 @@ namespace Web.Controllers
 			CorporateAction ca = new CorporateAction();
 
 			ca.CaId = scrubbingEvent.CaId;
-			ca.CaTypeLookupId = scrubbingEvent.CaTypeId.Value;
+			ca.CaTypeRegistryId = scrubbingEvent.CaTypeId.Value;
 
 			_context.CorporateActions.Add(ca);
 			_context.SaveChanges();
@@ -66,7 +66,7 @@ namespace Web.Controllers
 				Option option = new Option();
 				option.CaId = scrubbingEvent.CaId;
 				option.OptionNumber = optionDto.OptionNumber;
-				option.OptionTypeLookupId = optionDto.OptionTypeId.Value;
+				option.OptionTypeRegistryId = optionDto.OptionTypeId.Value;
 
 				_context.Options.Add(option);
 				_context.SaveChanges();
@@ -76,7 +76,7 @@ namespace Web.Controllers
 					Payout payout = new Payout();
 					payout.OptionId = option.OptionId;
 					payout.PayoutNumber = payoutDto.PayoutNumber;
-					payout.PayoutTypeLookupId = payoutDto.PayoutTypeId.Value;
+					payout.PayoutTypeRegistryId = payoutDto.PayoutTypeId.Value;
 
 					_context.Payouts.Add(payout);
 				}
@@ -89,31 +89,31 @@ namespace Web.Controllers
 
 		private void CreateFields(CorporateAction ca)
 		{
-			List<FieldLookup> caFields = _context.FieldLookups.Where(fld => fld.CaTypeLookupId == ca.CaTypeLookupId).ToList();
+			List<FieldRegistry> caFields = _context.FieldRegistry.Where(fld => fld.CaTypeRegistryId == ca.CaTypeRegistryId).ToList();
 			_context.FieldValues.AddRange(caFields.Select(fld => new FieldValue
 			{
 				CaId = ca.CaId,
-				FieldLookupId = fld.FieldLookupId,
+				FieldRegistryId = fld.FieldRegistryId,
 				IsScrubbed = false
 			}));
 
 			foreach (Option option in ca.Options)
 			{
-				List<FieldLookup> optionFields = _context.FieldLookups.Where(field => field.OptionTypeLookupId == option.OptionTypeLookupId).ToList();
+				List<FieldRegistry> optionFields = _context.FieldRegistry.Where(field => field.OptionTypeRegistryId == option.OptionTypeRegistryId).ToList();
 				_context.FieldValues.AddRange(optionFields.Select(fld => new FieldValue
 				{
 					OptionId = option.OptionId,
-					FieldLookupId = fld.FieldLookupId,
+					FieldRegistryId = fld.FieldRegistryId,
 					IsScrubbed = false
 				}));
 
 				foreach (Payout payout in option.Payouts)
 				{
-					List<FieldLookup> payoutFields = _context.FieldLookups.Where(field => field.PayoutTypeLookupId == payout.PayoutTypeLookupId).ToList();
+					List<FieldRegistry> payoutFields = _context.FieldRegistry.Where(field => field.PayoutTypeRegistryId == payout.PayoutTypeRegistryId).ToList();
 					_context.FieldValues.AddRange(payoutFields.Select(fld => new FieldValue
 					{
 						PayoutId = payout.PayoutId,
-						FieldLookupId = fld.FieldLookupId,
+						FieldRegistryId = fld.FieldRegistryId,
 						IsScrubbed = false
 					}));
 				}
@@ -131,7 +131,7 @@ namespace Web.Controllers
 					int fieldLookupId = pair.Key;
 					string fieldValue = pair.Value;
 
-					Expression<Func<FieldValue, bool>> expression = fld => fld.CaId == @event.CaId && fld.FieldLookupId == fieldLookupId;
+					Expression<Func<FieldValue, bool>> expression = fld => fld.CaId == @event.CaId && fld.FieldRegistryId == fieldLookupId;
 					SetFieldValue(fieldValue, expression);
 				}
 			}
@@ -149,7 +149,7 @@ namespace Web.Controllers
 							int fieldLookupId = pair.Key;
 							string fieldValue = pair.Value;
 
-							Expression<Func<FieldValue, bool>> expression = fld => fld.OptionId == option.OptionId && fld.FieldLookupId == fieldLookupId;
+							Expression<Func<FieldValue, bool>> expression = fld => fld.OptionId == option.OptionId && fld.FieldRegistryId == fieldLookupId;
 							SetFieldValue(fieldValue, expression);
 						}
 					}
@@ -166,7 +166,7 @@ namespace Web.Controllers
 									int fieldLookupId = pair.Key;
 									string fieldValue = pair.Value;
 
-									Expression<Func<FieldValue, bool>> expression = fld => fld.PayoutId == payout.PayoutId && fld.FieldLookupId == fieldLookupId;
+									Expression<Func<FieldValue, bool>> expression = fld => fld.PayoutId == payout.PayoutId && fld.FieldRegistryId == fieldLookupId;
 									SetFieldValue(fieldValue, expression);
 								}
 							}
@@ -184,25 +184,25 @@ namespace Web.Controllers
 			if (field != null)
 			{
 				field.IsScrubbed = true;
-				if (field.FieldLookup.FieldType == "DATE")
+				if (field.Field.FieldType == "DATE")
 				{
 					field.Value = fieldValue;
 				}
 			}
 
-			/*
+			
 			_context.EventLogs.Add(new EventLog
 			{
 				// TODO
 			});
-			*/
-		}
+			
+    }
 
-		#endregion COMMAND
+#endregion COMMAND
 
-		#region EVENT
+    #region EVENT
 
-		[HttpPost]
+    [HttpPost]
 		[Route("api/events/scrubbingevent")]
 		public IHttpActionResult PostScrubbing([FromBody] CaScrubbedEvent @event)
 		{
@@ -222,8 +222,8 @@ namespace Web.Controllers
 				_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
 				{
 					CaId = ca.CaId,
-					FieldLookupId = fld.FieldLookup.FieldLookupId,
-					FieldDisplay = fld.FieldLookup.FieldDisplay + " (IN)",
+					FieldRegistryId = fld.Field.FieldRegistryId,
+					FieldDisplay = fld.Field.FieldDisplay + " (IN)",
 					ProcessedDateCategory = ProcessedDateCategory.Missing,
 					IsSrubbed = false
 				}));
@@ -234,8 +234,8 @@ namespace Web.Controllers
 					_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
 					{
 						OptionId = option.OptionId,
-						FieldLookupId = fld.FieldLookup.FieldLookupId,
-						FieldDisplay = "Option #" + option.OptionNumber + " - " + fld.FieldLookup.FieldDisplay + " (IN)",
+						FieldRegistryId = fld.Field.FieldRegistryId,
+						FieldDisplay = "Option #" + option.OptionNumber + " - " + fld.Field.FieldDisplay + " (IN)",
 						ProcessedDateCategory = ProcessedDateCategory.Missing,
 						IsSrubbed = false
 					}));
@@ -246,8 +246,8 @@ namespace Web.Controllers
 						_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
 						{
 							PayoutId = payout.PayoutId,
-							FieldLookupId = fld.FieldLookup.FieldLookupId,
-							FieldDisplay = "Option #" + option.OptionNumber + " - " + "Payout #" + payout.PayoutNumber + " - " + fld.FieldLookup.FieldDisplay + " (IN)",
+							FieldRegistryId = fld.Field.FieldRegistryId,
+							FieldDisplay = "Option #" + option.OptionNumber + " - " + "Payout #" + payout.PayoutNumber + " - " + fld.Field.FieldDisplay + " (IN)",
 							ProcessedDateCategory = ProcessedDateCategory.Missing,
 							IsSrubbed = false
 						}));
@@ -273,7 +273,7 @@ namespace Web.Controllers
 
 				if (field.CaId != null)
 				{
-					scrubbingViews = _context.Scrubbing.Where(v => v.CaId == @event.CaId).ToList();
+					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.CaId == @event.CaId).ToList();
 					view = scrubbingViews.Single(v => v.CaId == field.CaId && v.FieldLookupId == field.FieldLookupId);
 					if (view != null && view.IsSrubbed == false)
 					{
@@ -285,7 +285,7 @@ namespace Web.Controllers
 
 				if (field.OptionId != null)
 				{
-					scrubbingViews = _context.Scrubbing.Where(v => v.OptionId == field.OptionId).ToList();
+					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.OptionId == field.OptionId).ToList();
 					view = scrubbingViews.Single(v => v.OptionId == field.OptionId && v.FieldLookupId == field.FieldLookupId);
 					if (view != null && view.IsSrubbed == false)
 					{
@@ -297,7 +297,7 @@ namespace Web.Controllers
 
 				if (field.PayoutId != null)
 				{
-					scrubbingViews = _context.Scrubbing.Where(v => v.PayoutId == field.PayoutId).ToList();
+					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.PayoutId == field.PayoutId).ToList();
 					view = scrubbingViews.Single(v => v.PayoutId == field.PayoutId && v.FieldLookupId == field.FieldLookupId);
 					if (view != null && view.IsSrubbed == false)
 					{
@@ -354,5 +354,6 @@ namespace Web.Controllers
 		#endregion EVENT
 
 		#endregion SCRUBBING
+        
 	}
 }

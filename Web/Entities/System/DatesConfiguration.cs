@@ -9,9 +9,9 @@ namespace Web.Entities.System
 
 		public int CaType { get; set; }
 
-		public int ProcessTypeLookupId { get; set; }
+		public int ProcessTypeRegistryId { get; set; }
 
-		public int FieldLookupId { get; set; }
+		public int FieldRegistryId { get; set; }
 
 		public int DateOffset { get; set; }
 

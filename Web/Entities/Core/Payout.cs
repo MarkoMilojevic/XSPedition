@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Web.Entities.Lookups;
+using Web.Entities.Registries;
 
 namespace Web.Entities.Core
 {
@@ -13,13 +13,13 @@ namespace Web.Entities.Core
 		public int OptionId { get; set; }
 
 		[Required]
-		public int PayoutTypeLookupId { get; set; }
+		public int PayoutTypeRegistryId { get; set; }
 
 		[Required]
 		public int PayoutNumber { get; set; }
 
-		[ForeignKey(nameof(Payout.PayoutTypeLookupId))]
-		public PayoutTypeLookup PayoutTypeLookup { get; set; }
+		[ForeignKey(nameof(Payout.PayoutTypeRegistryId))]
+		public PayoutTypeRegistry PayoutType { get; set; }
 
 		[ForeignKey(nameof(Payout.OptionId))]
 		public virtual Option Option{ get; set; }

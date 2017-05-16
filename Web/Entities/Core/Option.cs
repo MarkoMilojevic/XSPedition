@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Web.Entities.Lookups;
+using Web.Entities.Registries;
 
 namespace Web.Entities.Core
 {
@@ -14,13 +14,13 @@ namespace Web.Entities.Core
 		public int CaId { get; set; }
 
 		[Required]
-		public int OptionTypeLookupId { get; set; }
+		public int OptionTypeRegistryId { get; set; }
 
 		[Required]
 		public int OptionNumber { get; set; }
 
-		[ForeignKey(nameof(Option.OptionTypeLookupId))]
-		public OptionTypeLookup OptionTypeLookup { get; set; }
+		[ForeignKey(nameof(Option.OptionTypeRegistryId))]
+		public OptionTypeRegistry OptionType { get; set; }
 
 		[ForeignKey(nameof(Option.CaId))]
 		public virtual CorporateAction CorporateAction { get; set; }

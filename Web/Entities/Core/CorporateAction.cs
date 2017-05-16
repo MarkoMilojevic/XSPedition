@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Web.Entities.Lookups;
+using Web.Entities.Registries;
 
 namespace Web.Entities.Core
 {
@@ -11,10 +11,10 @@ namespace Web.Entities.Core
 		public int CaId { get; set; }
 		
 		[Required]
-		public int CaTypeLookupId { get; set; }
+		public int CaTypeRegistryId { get; set; }
 
-		[ForeignKey(nameof(CorporateAction.CaTypeLookupId))]
-		public virtual CaTypeLookup CaTypeLookup { get; set; }
+		[ForeignKey(nameof(CorporateAction.CaTypeRegistryId))]
+		public virtual CaTypeRegistry CaType { get; set; }
 		
 		public virtual List<Balance> Balances { get; set; }
 
