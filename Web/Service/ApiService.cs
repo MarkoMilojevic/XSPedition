@@ -34,30 +34,21 @@ namespace Web.Service
 			return result;
 		}
 
-		public void ExecuteScrubCa(ScrubCaCommand scrubbingEvent)
+		public void ExecuteScrubCa(ScrubCaCommand command)
 	    {
-	        HttpClient httpClient = ApiHttpClient.GetHttpClient();
+            HttpClient httpClient = ApiHttpClient.GetHttpClient();
 
-	        string serializedEvent = JsonConvert.SerializeObject(scrubbingEvent);
-	        StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
+            string serializedEvent = JsonConvert.SerializeObject(command);
+            StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
 
-			HttpResponseMessage response = httpClient.PostAsync("api/events/scrubbingcommand", httpContent).Result;
-	    }
+            HttpResponseMessage response = httpClient.PostAsync("api/events/scrubbing", httpContent).Result;
+        }
 
-		private CaProcessViewModel HandleScrubCaEvent(CaScrubbedEvent caScrubbedEvent)
+		private CaProcessViewModel HandleScrubCaEvent(CaScrubbedEvent @event)
 		{
-			HttpClient httpClient = ApiHttpClient.GetHttpClient();
-
-			string serializedEvent = JsonConvert.SerializeObject(caScrubbedEvent);
-			StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
-
-			HttpResponseMessage response = httpClient.PostAsync("api/events/scrubbingevent", httpContent).Result;
-			if (!response.IsSuccessStatusCode)
-			{
-				return null;
-			}
-
-			response = httpClient.GetAsync($"api/events/scrubbing/{caScrubbedEvent.CaId}").Result;
+            HttpClient httpClient = ApiHttpClient.GetHttpClient();
+            
+            HttpResponseMessage response = httpClient.GetAsync($"api/events/scrubbing/{@event.CaId}").Result;
 			if (!response.IsSuccessStatusCode)
 			{
 				return null;

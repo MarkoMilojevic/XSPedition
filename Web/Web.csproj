@@ -241,7 +241,7 @@
     <Compile Include="Entities\Denormalized\NotificationProcessView.cs" />
     <Compile Include="Entities\Denormalized\InstructionProcessView.cs" />
     <Compile Include="Entities\Denormalized\ResponseProcessView.cs" />
-    <Compile Include="Entities\Denormalized\ScrubbingProcessView.cs" />
+    <Compile Include="Entities\Denormalized\Scrubbing.cs" />
     <Compile Include="Entities\Registries\CaTypeRegistry.cs" />
     <Compile Include="Entities\Registries\FieldRegistry.cs" />
     <Compile Include="Entities\Registries\OptionTypeRegistry.cs" />

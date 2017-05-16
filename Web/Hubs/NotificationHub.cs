@@ -4,7 +4,6 @@ using System.Threading;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Web.DTO;
-using Web.Entities.Shared;
 using Web.Service;
 using Web.ViewModels;
 

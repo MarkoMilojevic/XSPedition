@@ -19,7 +19,7 @@ namespace Web.Entities
 
 		public DbSet<CaTimelineView> CaTimelineViews { get; set; }
 
-		public DbSet<Scrubbing> Scrubbing { get; set; }
+		public DbSet<ScrubbingInfo> Scrubbing { get; set; }
 
 		#endregion DENORMALIZED VIEWS
 
@@ -30,6 +30,7 @@ namespace Web.Entities
 		public DbSet<OptionTypeRegistry> OptionTypeRegistry { get; set; }
 		public DbSet<PayoutTypeRegistry> PayoutTypeRegistry { get; set; }
 		public DbSet<ProcessTypeRegistry> ProcessTypeRegistry { get; set; }
+
         public DbSet<CaTypeFieldMap> CaTypeFieldMap { get; set; }
         public DbSet<OptionTypeFieldMap> OptionTypeFieldMap { get; set; }
         public DbSet<PayoutTypeFieldMap> PayoutTypeFieldMap { get; set; }

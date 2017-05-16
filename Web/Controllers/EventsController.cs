@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Web.Http;
 using Web.DTO;
 using Web.Entities;
-using Web.Entities.Core;
 using Web.Entities.Denormalized;
 using Web.Entities.Registries;
 using Web.Entities.Shared;
@@ -14,346 +12,256 @@ using Web.ViewModels;
 
 namespace Web.Controllers
 {
-	public class EventsController : ApiController
-	{
-		private readonly XspDbContext _context;
+    public class EventsController : ApiController
+    {
+        private readonly XspDbContext _context;
 
-		public EventsController()
-		{
-			_context = new XspDbContext();
-		}
-        
-		#region SCRUBBING
+        public EventsController()
+        {
+            _context = new XspDbContext();
+        }
 
-		#region COMMAND
+        #region SCRUBBING
 
-		[HttpPost]
-		[Route("api/events/scrubbingcommand")]
-		public IHttpActionResult PostScrubbing([FromBody] ScrubCaCommand command)
-		{
-			CorporateAction ca = _context.CorporateActions.SingleOrDefault(c => c.CaId == command.CaId);
-			if (ca == null)
-			{
-				CreateCorporateActionAndFields(command);
-			}
-			else
-			{
-				SetFieldValues(command, ca);
-			}
+        [HttpGet]
+        [Route("api/events/scrubbing/{caId}")]
+        public IHttpActionResult GetScrubbing(int caId)
+        {
+            List<ScrubbingInfo> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == caId).ToList();
+            List<string> targetDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> criticalDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            int processedItemCount = scrubbingViews.Count(view => view.IsSrubbed);
+            int totalItemCount = scrubbingViews.Count;
 
-			return Ok();
-		}
+            return Ok(new CaProcessViewModel(ProcessType.Scrubbing, targetDateItems, criticalDateItems, processedItemCount, totalItemCount));
+        }
 
-		private void CreateCorporateActionAndFields(ScrubCaCommand command)
-		{
-			CorporateAction ca = CreateCorporateAction(command);
-			CreateFields(ca);
-			SetFieldValues(command, ca);
-		}
+        [HttpPost]
+        [Route("api/events/scrubbing")]
+        public IHttpActionResult PostScrubbing([FromBody] ScrubCaCommand command)
+        {
+            List<ScrubbingInfo> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == command.CaId).ToList();
+            if (scrubbingViews.Count == 0)
+            {
+                CreateScrubbingInfo(command);
+            }
 
-		private CorporateAction CreateCorporateAction(ScrubCaCommand scrubbingEvent)
-		{
-			CorporateAction ca = new CorporateAction();
+            UpdateScrubbingInfo(command);
 
-			ca.CaId = scrubbingEvent.CaId;
-			ca.CaTypeRegistryId = scrubbingEvent.CaTypeId.Value;
+            return Ok();
+        }
 
-			_context.CorporateActions.Add(ca);
-			_context.SaveChanges();
+        private void CreateScrubbingInfo(ScrubCaCommand command)
+        {
+            ScrubbingInfo info = null;
+            
+            List<int> caFieldRegistryIds = _context
+                                            .CaTypeFieldMap
+                                            .Where(map => map.CaTypeRegistryId == command.CaTypeId.Value)
+                                            .Select(map => map.FieldRegistryId)
+                                            .ToList();
 
-			foreach (OptionDto optionDto in scrubbingEvent.Options)
-			{
-				Option option = new Option();
-				option.CaId = scrubbingEvent.CaId;
-				option.OptionNumber = optionDto.OptionNumber;
-				option.OptionTypeRegistryId = optionDto.OptionTypeId.Value;
+            List<FieldRegistry> caFields = _context
+                                            .FieldRegistry
+                                            .Where(fld => caFieldRegistryIds.Contains(fld.FieldRegistryId))
+                                            .ToList();
 
-				_context.Options.Add(option);
-				_context.SaveChanges();
+            foreach (FieldRegistry caField in caFields)
+            {
+                info = new ScrubbingInfo();
+                info.CaId = command.CaId;
+                info.CaTypeId = command.CaTypeId.Value;
+                info.OptionNumber = null;
+                info.OptionTypeId = null;
+                info.PayoutNumber = null;
+                info.PayoutTypeId = null;
+                info.FieldDisplay = caField.FieldDisplay + " (IN)";
+                info.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                info.IsSrubbed = false;
 
-				foreach (PayoutDto payoutDto in optionDto.Payouts)
-				{
-					Payout payout = new Payout();
-					payout.OptionId = option.OptionId;
-					payout.PayoutNumber = payoutDto.PayoutNumber;
-					payout.PayoutTypeRegistryId = payoutDto.PayoutTypeId.Value;
+                _context.Scrubbing.Add(info);
+            }
 
-					_context.Payouts.Add(payout);
-				}
+            foreach (OptionDto optionDto in command.Options)
+            {
+                List<int> optionFieldRegistryIds = _context
+                                                    .OptionTypeFieldMap
+                                                    .Where(map => map.OptionTypeRegistryId == optionDto.OptionTypeId.Value)
+                                                    .Select(map => map.FieldRegistryId)
+                                                    .ToList();
 
-				_context.SaveChanges();
-			}
+                List<FieldRegistry> optionFields = _context
+                                                    .FieldRegistry
+                                                    .Where(fld => optionFieldRegistryIds.Contains(fld.FieldRegistryId))
+                                                    .ToList();
 
-			return _context.CorporateActions.Single(c => c.CaId == ca.CaId);
-		}
+                foreach (FieldRegistry optionField in optionFields)
+                {
+                    info = new ScrubbingInfo();
+                    info.CaId = command.CaId;
+                    info.CaTypeId = command.CaTypeId.Value;
+                    info.OptionNumber = optionDto.OptionNumber;
+                    info.OptionTypeId = optionDto.OptionTypeId.Value;
+                    info.PayoutNumber = null;
+                    info.PayoutTypeId = null;
+                    info.FieldDisplay = optionField.FieldDisplay + " (IN)";
+                    info.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    info.IsSrubbed = false;
 
-		private void CreateFields(CorporateAction ca)
-		{
-			List<FieldRegistry> caFields = _context.FieldRegistry.Where(fld => fld.CaTypeRegistryId == ca.CaTypeRegistryId).ToList();
-			_context.FieldValues.AddRange(caFields.Select(fld => new FieldValue
-			{
-				CaId = ca.CaId,
-				FieldRegistryId = fld.FieldRegistryId,
-				IsScrubbed = false
-			}));
+                    _context.Scrubbing.Add(info);
+                }
 
-			foreach (Option option in ca.Options)
-			{
-				List<FieldRegistry> optionFields = _context.FieldRegistry.Where(field => field.OptionTypeRegistryId == option.OptionTypeRegistryId).ToList();
-				_context.FieldValues.AddRange(optionFields.Select(fld => new FieldValue
-				{
-					OptionId = option.OptionId,
-					FieldRegistryId = fld.FieldRegistryId,
-					IsScrubbed = false
-				}));
+                foreach (PayoutDto payoutDto in optionDto.Payouts)
+                {
+                    List<int> payoutFieldRegistryIds = _context
+                                                        .PayoutTypeFieldMap
+                                                        .Where(map => map.PayoutTypeRegistryId == payoutDto.PayoutTypeId.Value)
+                                                        .Select(map => map.FieldRegistryId)
+                                                        .ToList();
 
-				foreach (Payout payout in option.Payouts)
-				{
-					List<FieldRegistry> payoutFields = _context.FieldRegistry.Where(field => field.PayoutTypeRegistryId == payout.PayoutTypeRegistryId).ToList();
-					_context.FieldValues.AddRange(payoutFields.Select(fld => new FieldValue
-					{
-						PayoutId = payout.PayoutId,
-						FieldRegistryId = fld.FieldRegistryId,
-						IsScrubbed = false
-					}));
-				}
-			}
+                    List<FieldRegistry> payoutFields = _context
+                                                        .FieldRegistry
+                                                        .Where(fld => payoutFieldRegistryIds.Contains(fld.FieldRegistryId))
+                                                        .ToList();
 
-			_context.SaveChanges();
-		}
+                    foreach (FieldRegistry payoutField in payoutFields)
+                    {
+                        info = new ScrubbingInfo();
+                        info.CaId = command.CaId;
+                        info.CaTypeId = command.CaTypeId.Value;
+                        info.OptionNumber = optionDto.OptionNumber;
+                        info.OptionTypeId = optionDto.OptionTypeId.Value;
+                        info.PayoutNumber = payoutDto.PayoutNumber;
+                        info.PayoutTypeId = payoutDto.PayoutTypeId.Value;
+                        info.FieldDisplay = payoutField.FieldDisplay + " (IN)";
+                        info.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                        info.IsSrubbed = false;
 
-		private void SetFieldValues(ScrubCaCommand @event, CorporateAction ca)
-		{
-			if (@event.Fields != null)
-			{
-				foreach (KeyValuePair<int, string> pair in @event.Fields)
-				{
-					int fieldLookupId = pair.Key;
-					string fieldValue = pair.Value;
+                        _context.Scrubbing.Add(info);
+                    }
+                }
+            }
 
-					Expression<Func<FieldValue, bool>> expression = fld => fld.CaId == @event.CaId && fld.FieldRegistryId == fieldLookupId;
-					SetFieldValue(fieldValue, expression);
-				}
-			}
+            _context.SaveChanges();
+        }
 
-			if (@event.Options != null)
-			{
-				foreach (OptionDto optionDto in @event.Options)
-				{
-					Option option = ca.Options.SingleOrDefault(opt => opt.OptionNumber == optionDto.OptionNumber);
+        private void UpdateScrubbingInfo(ScrubCaCommand command)
+        {
+            CaTimelineView timeline = _context.CaTimelineViews.First(t => t.CaId == command.CaId);
 
-					if (optionDto.Fields != null)
-					{
-						foreach (KeyValuePair<int, string> pair in optionDto.Fields)
-						{
-							int fieldLookupId = pair.Key;
-							string fieldValue = pair.Value;
+            ScrubbingInfo info = null;
 
-							Expression<Func<FieldValue, bool>> expression = fld => fld.OptionId == option.OptionId && fld.FieldRegistryId == fieldLookupId;
-							SetFieldValue(fieldValue, expression);
-						}
-					}
+            if (command.Fields != null)
+            {
+                foreach (KeyValuePair<int, string> caField in command.Fields)
+                {
+                    info = new ScrubbingInfo();
+                    info.CaId = command.CaId;
+                    info.CaTypeId = command.CaTypeId != null ? command.CaTypeId.Value : GetCaTypeId(command.CaId);
+                    info.OptionNumber = null;
+                    info.OptionTypeId = null;
+                    info.PayoutNumber = null;
+                    info.PayoutTypeId = null;
 
-					if (optionDto.Payouts != null)
-					{
-						foreach (PayoutDto payoutDto in optionDto.Payouts)
-						{
-							if (payoutDto.Fields != null)
-							{
-								Payout payout = option.Payouts.SingleOrDefault(p => p.PayoutNumber == payoutDto.PayoutNumber);
-								foreach (KeyValuePair<int, string> pair in payoutDto.Fields)
-								{
-									int fieldLookupId = pair.Key;
-									string fieldValue = pair.Value;
+                    string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == caField.Key).FieldDisplay;
+                    info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
 
-									Expression<Func<FieldValue, bool>> expression = fld => fld.PayoutId == payout.PayoutId && fld.FieldRegistryId == fieldLookupId;
-									SetFieldValue(fieldValue, expression);
-								}
-							}
-						}
-					}
-				}
-			}
+                    info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
+                    info.IsSrubbed = true;
 
-			_context.SaveChanges();
-		}
+                    _context.Scrubbing.Add(info);
+                }
+            }
 
-		private void SetFieldValue(string fieldValue, Expression<Func<FieldValue, bool>> expression)
-		{
-			FieldValue field = _context.FieldValues.SingleOrDefault(expression);
-			if (field != null)
-			{
-				field.IsScrubbed = true;
-				if (field.Field.FieldType == "DATE")
-				{
-					field.Value = fieldValue;
-				}
-			}
+            if (command.Options != null)
+            {
+                foreach (OptionDto optionDto in command.Options)
+                {
+                    if (optionDto.Fields != null)
+                    {
+                        foreach (KeyValuePair<int, string> optionField in optionDto.Fields)
+                        {
+                            info = new ScrubbingInfo();
+                            info.CaId = command.CaId;
+                            info.CaTypeId = command.CaTypeId != null ? command.CaTypeId.Value : GetCaTypeId(command.CaId);
+                            info.OptionNumber = optionDto.OptionNumber;
+                            info.OptionTypeId = optionDto.OptionTypeId != null ? optionDto.OptionTypeId.Value : GetOptionTypeId(command.CaId, optionDto.OptionNumber);
+                            info.PayoutNumber = null;
+                            info.PayoutTypeId = null;
 
-			
-			_context.EventLogs.Add(new EventLog
-			{
-				// TODO
-			});
-			
+                            string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == optionField.Key).FieldDisplay;
+                            info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
+
+                            info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
+                            info.IsSrubbed = true;
+
+                            _context.Scrubbing.Add(info);
+                        }
+                    }
+
+                    if (optionDto.Payouts != null)
+                    {
+                        foreach (PayoutDto payoutDto in optionDto.Payouts)
+                        {
+                            if (payoutDto.Fields != null)
+                            {
+                                foreach (KeyValuePair<int, string> payoutField in payoutDto.Fields)
+                                {
+                                    info = new ScrubbingInfo();
+                                    info.CaId = command.CaId;
+                                    info.CaTypeId = command.CaTypeId != null ? command.CaTypeId.Value : GetCaTypeId(command.CaId);
+                                    info.OptionNumber = optionDto.OptionNumber;
+                                    info.OptionTypeId = optionDto.OptionTypeId != null ? optionDto.OptionTypeId.Value : GetOptionTypeId(command.CaId, optionDto.OptionNumber);
+                                    info.PayoutNumber = payoutDto.PayoutNumber;
+                                    info.PayoutTypeId = payoutDto.PayoutTypeId != null ? payoutDto.PayoutTypeId.Value : GetPayoutTypeId(command.CaId, optionDto.OptionNumber, payoutDto.PayoutNumber);
+
+                                    string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == payoutField.Key).FieldDisplay;
+                                    info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
+
+                                    info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
+                                    info.IsSrubbed = true;
+
+                                    _context.Scrubbing.Add(info);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+        private int GetCaTypeId(int caId)
+        {
+            return _context.Scrubbing.First(s => s.CaId == caId && s.CaTypeId != null).CaTypeId.Value;
+        }
+
+        private int GetOptionTypeId(int caId, int optionNumber)
+        {
+            return _context.Scrubbing.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.OptionTypeId != null).OptionTypeId.Value;
+        }
+
+        private int GetPayoutTypeId(int caId, int optionNumber, int payoutNumber)
+        {
+            return _context.Scrubbing.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.PayoutNumber == payoutNumber && s.PayoutTypeId != null).PayoutTypeId.Value;
+        }
+
+        private ProcessedDateCategory GetProcessedDateCategory(DateTime eventDate, DateTime targetDate, DateTime criticalDate)
+        {
+            if (eventDate <= targetDate)
+            {
+                return ProcessedDateCategory.TargetDate;
+            }
+
+            if (eventDate <= criticalDate)
+            {
+                return ProcessedDateCategory.CriticalDate;
+            }
+
+            return ProcessedDateCategory.LateDate;
+        }
+
+        #endregion SCRUBBING
     }
-
-#endregion COMMAND
-
-    #region EVENT
-
-    [HttpPost]
-		[Route("api/events/scrubbingevent")]
-		public IHttpActionResult PostScrubbing([FromBody] CaScrubbedEvent @event)
-		{
-			CorporateAction ca = _context.CorporateActions.SingleOrDefault(c => c.CaId == @event.CaId);
-
-			CaTimelineView timelineView = _context.CaTimelineViews.SingleOrDefault(ctv => ctv.CaId == @event.CaId);
-			if (timelineView == null)
-			{
-				// TODO
-				// CREATE CA TIMELINE VIEW
-			}
-
-			List<Scrubbing> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == @event.CaId).ToList();
-			if (scrubbingViews.Count == 0)
-			{
-				List<FieldValue> fields = _context.FieldValues.Where(fld => fld.CaId == ca.CaId).ToList();
-				_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
-				{
-					CaId = ca.CaId,
-					FieldRegistryId = fld.Field.FieldRegistryId,
-					FieldDisplay = fld.Field.FieldDisplay + " (IN)",
-					ProcessedDateCategory = ProcessedDateCategory.Missing,
-					IsSrubbed = false
-				}));
-
-				foreach (Option option in ca.Options)
-				{
-					fields = _context.FieldValues.Where(fld => fld.OptionId == option.OptionId).ToList();
-					_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
-					{
-						OptionId = option.OptionId,
-						FieldRegistryId = fld.Field.FieldRegistryId,
-						FieldDisplay = "Option #" + option.OptionNumber + " - " + fld.Field.FieldDisplay + " (IN)",
-						ProcessedDateCategory = ProcessedDateCategory.Missing,
-						IsSrubbed = false
-					}));
-
-					foreach (Payout payout in option.Payouts)
-					{
-						fields = _context.FieldValues.Where(fld => fld.PayoutId == payout.PayoutId).ToList();
-						_context.Scrubbing.AddRange(fields.Select(fld => new Scrubbing
-						{
-							PayoutId = payout.PayoutId,
-							FieldRegistryId = fld.Field.FieldRegistryId,
-							FieldDisplay = "Option #" + option.OptionNumber + " - " + "Payout #" + payout.PayoutNumber + " - " + fld.Field.FieldDisplay + " (IN)",
-							ProcessedDateCategory = ProcessedDateCategory.Missing,
-							IsSrubbed = false
-						}));
-					}
-				}
-
-				_context.SaveChanges();
-			}
-
-			List<FieldValue> flds = _context.FieldValues.Where(fld => fld.CaId == ca.CaId).ToList();
-			foreach (Option option in ca.Options)
-			{
-				flds.AddRange(_context.FieldValues.Where(fld => fld.OptionId == option.OptionId));
-				foreach (Payout payout in option.Payouts)
-				{
-					flds.AddRange(_context.FieldValues.Where(fld => fld.PayoutId == payout.PayoutId).ToList());
-				}
-			}
-
-			foreach (FieldValue field in flds)
-			{
-				Scrubbing view;
-
-				if (field.CaId != null)
-				{
-					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.CaId == @event.CaId).ToList();
-					view = scrubbingViews.Single(v => v.CaId == field.CaId && v.FieldLookupId == field.FieldLookupId);
-					if (view != null && view.IsSrubbed == false)
-					{
-						view.IsSrubbed = field.IsScrubbed;
-						view.ProcessedDateCategory = GetProcessedDateCategory(@event.Date, timelineView.ScrubbingTarget, timelineView.ScrubbingCritical);
-						view.FieldDisplay = view.FieldDisplay.Substring(0, view.FieldDisplay.Length - 4) + "(CO)";
-					}
-				}
-
-				if (field.OptionId != null)
-				{
-					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.OptionId == field.OptionId).ToList();
-					view = scrubbingViews.Single(v => v.OptionId == field.OptionId && v.FieldLookupId == field.FieldLookupId);
-					if (view != null && view.IsSrubbed == false)
-					{
-						view.IsSrubbed = field.IsScrubbed;
-						view.ProcessedDateCategory = GetProcessedDateCategory(@event.Date, timelineView.ScrubbingTarget, timelineView.ScrubbingCritical);
-						view.FieldDisplay = view.FieldDisplay.Substring(0, view.FieldDisplay.Length - 4) + "(CO)";
-					}
-				}
-
-				if (field.PayoutId != null)
-				{
-					scrubbingViews = _context.ScrubbingProcessViews.Where(v => v.PayoutId == field.PayoutId).ToList();
-					view = scrubbingViews.Single(v => v.PayoutId == field.PayoutId && v.FieldLookupId == field.FieldLookupId);
-					if (view != null && view.IsSrubbed == false)
-					{
-						view.IsSrubbed = field.IsScrubbed;
-						view.ProcessedDateCategory = GetProcessedDateCategory(@event.Date, timelineView.ScrubbingTarget, timelineView.ScrubbingCritical);
-						view.FieldDisplay = view.FieldDisplay.Substring(0, view.FieldDisplay.Length - 4) + "(CO)";
-					}
-				}
-			}
-
-			_context.SaveChanges();
-
-			return Ok();
-		}
-
-		[HttpGet]
-		[Route("api/events/scrubbing/{caId}")]
-		public IHttpActionResult GetScrubbing(int caId)
-		{
-			CorporateAction ca = _context.CorporateActions.Single(c => c.CaId == caId);
-			List<Scrubbing> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == caId).ToList();
-			foreach (Option option in ca.Options)
-			{
-				scrubbingViews.AddRange(_context.Scrubbing.Where(view => view.OptionId == option.OptionId));
-				foreach (Payout payout in option.Payouts)
-				{
-					scrubbingViews.AddRange(_context.Scrubbing.Where(view => view.PayoutId == payout.PayoutId));
-				}
-			}
-
-			List<string> targetDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
-			List<string> criticalDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
-			int processedItemCount = scrubbingViews.Count(view => view.IsSrubbed);
-			int totalItemCount = scrubbingViews.Count;
-
-			return Ok(new CaProcessViewModel(ProcessType.Scrubbing, targetDateItems, criticalDateItems, processedItemCount, totalItemCount));
-		}
-
-		private ProcessedDateCategory GetProcessedDateCategory(DateTime eventDate, DateTime targetDate, DateTime criticalDate)
-		{
-			if (eventDate <= targetDate)
-			{
-				return ProcessedDateCategory.TargetDate;
-			}
-
-			if (eventDate <= criticalDate)
-			{
-				return ProcessedDateCategory.CriticalDate;
-			}
-
-			return ProcessedDateCategory.LateDate;
-		}
-
-		#endregion EVENT
-
-		#endregion SCRUBBING
-        
-	}
 }
