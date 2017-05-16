@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Web.Entities.Lookups;
+using Web.Entities.Registries;
 
 namespace Web.Entities.Core
 {
@@ -10,7 +10,7 @@ namespace Web.Entities.Core
 		public int FieldValueId { get; set; }
 		
 		[Required]
-		public int FieldLookupId { get; set; }
+		public int FieldRegistryId { get; set; }
 
 		public string Value { get; set; }
 		
@@ -22,8 +22,8 @@ namespace Web.Entities.Core
 
 		public int? PayoutId { get; set; }
 
-		[ForeignKey(nameof(FieldValue.FieldLookupId))]
-		public virtual FieldLookup FieldLookup { get; set; }
+		[ForeignKey(nameof(FieldValue.FieldRegistryId))]
+		public virtual FieldRegistry Field { get; set; }
 
 	}
 }

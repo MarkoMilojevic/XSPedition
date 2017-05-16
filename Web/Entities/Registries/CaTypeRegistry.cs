@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Web.Entities.Lookups
+namespace Web.Entities.Registries
 {
-	public class CaTypeLookup
+	public class CaTypeRegistry
 	{
 		[Key]
-		public int CaTypeLookupId { get; set; }
+		public int CaTypeRegistryId { get; set; }
 		
 		[Required]
 		public string Code { get; set; }

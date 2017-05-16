@@ -7,13 +7,13 @@ namespace Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddOptionsAndPayouts : IMigrationMetadata
+    public sealed partial class ResetDDL : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddOptionsAndPayouts));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ResetDDL));
         
         string IMigrationMetadata.Id
         {
-            get { return "201705132022439_AddOptionsAndPayouts"; }
+            get { return "201705161018319_ResetDDL"; }
         }
         
         string IMigrationMetadata.Source

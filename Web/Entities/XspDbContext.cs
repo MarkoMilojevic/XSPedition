@@ -1,7 +1,9 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.ModelConfiguration.Conventions;
 using Web.Entities.Core;
 using Web.Entities.Denormalized;
-using Web.Entities.Lookups;
+using Web.Entities.Registries;
+using Web.Entities.Registries.Maps;
 using Web.Entities.System;
 
 namespace Web.Entities
@@ -37,22 +39,29 @@ namespace Web.Entities
 
 		#endregion DENORMALIZED VIEWS
 
-		#region LOOKUPS
+		#region REGISTRIES
 
-		public DbSet<CaTypeLookup> CaTypeLookups { get; set; }
-		public DbSet<FieldLookup> FieldLookups { get; set; }
-		public DbSet<OptionTypeLookup> OptionTypeLookups { get; set; }
-		public DbSet<PayoutTypeLookup> PayoutTypeLookups { get; set; }
-		public DbSet<ProcessTypeLookup> ProcessTypeLookups { get; set; }
+		public DbSet<CaTypeRegistry> CaTypeRegistry { get; set; }
+		public DbSet<FieldRegistry> FieldRegistry { get; set; }
+		public DbSet<OptionTypeRegistry> OptionTypeRegistry { get; set; }
+		public DbSet<PayoutTypeRegistry> PayoutTypeRegistry { get; set; }
+		public DbSet<ProcessTypeRegistry> ProcessTypeRegistry { get; set; }
+        public DbSet<CaTypeFieldMap> CaTypeFieldMap { get; set; }
+        public DbSet<OptionTypeFieldMap> OptionTypeFieldMap { get; set; }
+        public DbSet<PayoutTypeFieldMap> PayoutTypeFieldMap { get; set; }
 
-		#endregion LOOKUPS
+        #endregion REGISTRIES
 
-		#region SYSTEM
+        #region SYSTEM
 
-		public DbSet<DatesConfiguration> DatesConfigurations { get; set; }
+        public DbSet<DatesConfiguration> DatesConfigurations { get; set; }
 		public DbSet<EventLog> EventLogs { get; set; }
 
 		#endregion SYSTEM
 
+	    protected override void OnModelCreating(DbModelBuilder modelBuilder)
+	    {
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        }
 	}
 }

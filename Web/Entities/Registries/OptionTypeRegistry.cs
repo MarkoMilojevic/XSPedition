@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Web.Entities.Lookups
+namespace Web.Entities.Registries
 {
-	public class OptionTypeLookup
+	public class OptionTypeRegistry
 	{
 		[Key]
-		public int OptionTypeLookupId { get; set; }
+		public int OptionTypeRegistryId { get; set; }
 
 		[Required]
 		public string Code { get; set; }
