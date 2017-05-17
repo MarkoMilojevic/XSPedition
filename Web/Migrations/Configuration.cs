@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Web.Entities.Core;
 using Web.Entities.Denormalized;
 using Web.Entities.Registries;
@@ -18,6 +19,8 @@ namespace Web.Migrations
 
         protected override void Seed(Web.Entities.XspDbContext context)
         {
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin", string.Empty) + "\\Migrations";
+            context.Database.ExecuteSqlCommand(File.ReadAllText(baseDir + "\\seed.sql"));
             /*
 			context.CaTypeRegistry.AddOrUpdate(lu => lu.CaTypeRegistryId,
 				new CaTypeRegistry { CaTypeRegistryId = 1, Code = "RES" }
