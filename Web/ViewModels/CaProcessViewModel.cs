@@ -13,26 +13,31 @@ namespace Web.ViewModels
 	                this.id = "scrub";
                     this.title = "CA Scrubbing";
                     this.processActionName = "Scrubbed";
-	                break;
+                    this.processType = ProcessType.Scrubbing;
+                    break;
 	            case ProcessType.Notification:
                     this.id = "notif";
                     this.title = "Notification";
                     this.processActionName = "Sent";
+                    this.processType = ProcessType.Notification;
                     break;
 	            case ProcessType.Response:
                     this.id = "respo";
                     this.title = "Response";
                     this.processActionName = "Submitted";
+                    this.processType = ProcessType.Response;
                     break;
 	            case ProcessType.Instruction:
                     this.id = "instr";
                     this.title = "Instruction";
                     this.processActionName = "Instructed";
+                    this.processType = ProcessType.Instruction;
                     break;
 	            case ProcessType.Payment:
                     this.id = "payme";
                     this.title = "Payment";
                     this.processActionName = "Settled";
+                    this.processType = ProcessType.Payment;
                     break;
 	        }
 
@@ -64,5 +69,7 @@ namespace Web.ViewModels
         public readonly int processedItemCount;
 
         public readonly decimal processPercentage;
-	}
+
+        public readonly ProcessType processType;
+    }
 }

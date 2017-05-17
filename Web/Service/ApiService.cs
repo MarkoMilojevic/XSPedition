@@ -30,7 +30,11 @@ namespace Web.Service
 				case CommandType.Respond:
 					break;
 				case CommandType.Instruct:
-					break;
+                    InstructCommand instructCommand = (InstructCommand)command;
+                    ExecuteInstruction(instructCommand);
+
+                    result = HandleInstructionEvent(instructCommand.CaId);
+                    break;
 				case CommandType.Pay:
 					break;
 			}
@@ -77,6 +81,30 @@ namespace Web.Service
             HttpClient httpClient = ApiHttpClient.GetHttpClient();
 
             HttpResponseMessage response = httpClient.GetAsync($"api/events/notifications/{caId}").Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            string responseContent = response.Content.ReadAsStringAsync().Result;
+            return JsonConvert.DeserializeObject<CaProcessViewModel>(responseContent);
+        }
+
+        public void ExecuteInstruction(InstructCommand command)
+        {
+            HttpClient httpClient = ApiHttpClient.GetHttpClient();
+
+            string serializedEvent = JsonConvert.SerializeObject(command);
+            StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
+
+            HttpResponseMessage response = httpClient.PostAsync("api/events/instructions", httpContent).Result;
+        }
+
+        private CaProcessViewModel HandleInstructionEvent(int caId)
+        {
+            HttpClient httpClient = ApiHttpClient.GetHttpClient();
+
+            HttpResponseMessage response = httpClient.GetAsync($"api/events/instructions/{caId}").Result;
             if (!response.IsSuccessStatusCode)
             {
                 return null;

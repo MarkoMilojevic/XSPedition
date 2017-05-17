@@ -223,6 +223,7 @@
     <Compile Include="Controllers\SignalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\EventsController.cs" />
+    <Compile Include="Entities\InstructionInfo.cs" />
     <Compile Include="Entities\NotificationInfo.cs" />
     <Compile Include="Events\CaScrubbedEvent.cs" />
     <Compile Include="Entities\Registries\Maps\CaTypeFieldMap.cs" />
@@ -270,6 +271,10 @@
     <Compile Include="Migrations\201705171251244_SetProcessedDateToNullableField.cs" />
     <Compile Include="Migrations\201705171251244_SetProcessedDateToNullableField.Designer.cs">
       <DependentUpon>201705171251244_SetProcessedDateToNullableField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.cs" />
+    <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.Designer.cs">
+      <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -972,6 +977,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705171251244_SetProcessedDateToNullableField.resx">
       <DependentUpon>201705171251244_SetProcessedDateToNullableField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705171442429_AddInstructionInfoTable.resx">
+      <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

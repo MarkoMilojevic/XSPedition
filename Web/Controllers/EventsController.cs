@@ -315,7 +315,101 @@ namespace Web.Controllers
         }
 
         #endregion
-        
+
+        #region INSTRUCTIONS
+
+        [HttpGet]
+        [Route("api/events/instructions/{caId}")]
+        public IHttpActionResult GetInstructions(int caId)
+        {
+            List<InstructionInfo> instructions = _context.InstructionsInfo.Where(view => view.CaId == caId).ToList();
+            List<string> targetDateItems = instructions.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> criticalDateItems = instructions.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> lateDateItems = instructions.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.LateDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> missingItems = instructions.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.Missing).Select(spv => spv.FieldDisplay).ToList();
+            int processedItemCount = instructions.Count(view => view.IsInstructed && (view.ProcessedDateCategory == ProcessedDateCategory.TargetDate || view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate));
+            int totalItemCount = instructions.Count;
+
+            return Ok(new CaProcessViewModel(ProcessType.Instruction, targetDateItems, criticalDateItems, lateDateItems, missingItems, processedItemCount, totalItemCount));
+        }
+
+        [HttpPost]
+        [Route("api/events/instructions")]
+        public IHttpActionResult PostInstructions([FromBody] InstructCommand command)
+        {
+            List<InstructionInfo> instructions = _context.InstructionsInfo.Where(view => view.CaId == command.CaId).ToList();
+            if (instructions.Count == 0)
+            {
+                CreateInstructionsInfo(command);
+            }
+            else
+            {
+                UpdateInstructionInfo(command);
+            }
+
+            return Ok();
+        }
+
+        private void CreateInstructionsInfo(InstructCommand command)
+        {
+            foreach (InstructionDto instructionDto in command.Instructions)
+            {
+                InstructionInfo instruction = new InstructionInfo();
+
+                instruction.CaId = command.CaId;
+                instruction.CaTypeId = command.CaTypeId;
+                instruction.VolManCho = command.VolManCho;
+                instruction.AccountNumber = instructionDto.AccountNumber;
+                instruction.FieldDisplay = instructionDto.AccountNumber;
+
+                if (instructionDto.IsInstructed)
+                {
+                    instruction.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Notification, command.CaId, command.EventDate);
+                    instruction.IsInstructed = true;
+                    instruction.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    instruction.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    instruction.IsInstructed = false;
+                    instruction.ProcessedDate = null;
+                }
+                _context.InstructionsInfo.Add(instruction);
+            }
+            _context.SaveChanges();
+        }
+
+        private void UpdateInstructionInfo(InstructCommand command)
+        {
+            foreach (InstructionDto instructionDto in command.Instructions)
+            {
+                InstructionInfo instruction = _context.InstructionsInfo.FirstOrDefault(notif => notif.CaId == command.CaId && notif.AccountNumber == instructionDto.AccountNumber);
+
+                if (instruction == null)
+                {
+                    continue;
+                }
+
+                if (instructionDto.IsInstructed)
+                {
+                    instruction.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Notification, command.CaId, command.EventDate);
+                    instruction.IsInstructed = true;
+                    instruction.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    instruction.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    instruction.IsInstructed = false;
+                    instruction.ProcessedDate = null;
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+        #endregion
+
+        #region COMMON METHODS
         private ProcessedDateCategory CalculateProcessedDateCategory(ProcessType processType, int caId, DateTime eventDate)
         {
             DateTime targetDate = new DateTime();
@@ -368,5 +462,7 @@ namespace Web.Controllers
 
             return ProcessedDateCategory.LateDate;
         }
+
+        #endregion
     }
 }

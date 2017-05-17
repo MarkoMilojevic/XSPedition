@@ -25,7 +25,8 @@ namespace Web.Hubs
             const int sleepTime = 10000;
 
             //ScrubCaCommand command = CreateFirstCAScrubbingEvent();
-            NotifyCommand command = CreateFirstNotifyEvent();
+            // NotifyCommand command = CreateFirstNotifyEvent();
+            InstructCommand command = CreateFirstInstructionEvent();
             CaProcessViewModel viewModel = _apiService.Execute(command);
 	        if (viewModel != null)
 	        {
@@ -33,13 +34,48 @@ namespace Web.Hubs
 				Thread.Sleep(sleepTime);
 	        }
 
-            command = CreateSecondNotifyEvent();
+            command = CreateSecondInstructionEvent();
             viewModel = _apiService.Execute(command);
             if (viewModel != null)
             {
                 Clients.All.updateProcess(viewModel);
                 Thread.Sleep(sleepTime);
             }
+        }
+
+        private InstructCommand CreateFirstInstructionEvent()
+        {
+            return new InstructCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Instructions = new List<InstructionDto>
+                {
+                    new InstructionDto { AccountNumber = "XSP01", IsInstructed = false},
+                    new InstructionDto { AccountNumber = "XSP02", IsInstructed = false},
+                    new InstructionDto { AccountNumber = "XSP03", IsInstructed = false}
+                }
+            };
+        }
+
+        private InstructCommand CreateSecondInstructionEvent()
+        {
+            return new InstructCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Instructions = new List<InstructionDto>
+                {
+                    new InstructionDto { AccountNumber = "XSP01", IsInstructed = true},
+                    new InstructionDto { AccountNumber = "XSP03", IsInstructed = true}
+                }
+            };
         }
 
         private NotifyCommand CreateFirstNotifyEvent()
