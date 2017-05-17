@@ -5,11 +5,11 @@ namespace Xspedition.Common.Commands
 {
     public class RespondCommand: Command
     {
-        public List<ResponseDto> ResponseDto { get; set; }
+        public List<ResponseDto> Responses { get; set; }
 
         public RespondCommand(): base(CommandType.Respond)
         {
-            ResponseDto = new List<ResponseDto>();
+            Responses = new List<ResponseDto>();
         }
     }
 }

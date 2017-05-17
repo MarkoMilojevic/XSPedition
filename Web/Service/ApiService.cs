@@ -32,7 +32,9 @@ namespace Web.Service
                     result = HandleEvent(command.CaId, XSPEditionURL.NOTIFICATIONS);
                     break;
                 case CommandType.Respond:
-					break;
+                    ExecuteCommand(command, XSPEditionURL.RESPONSES);
+                    result = HandleEvent(command.CaId, XSPEditionURL.RESPONSES);
+                    break;
 				case CommandType.Instruct:
                     ExecuteCommand(command, XSPEditionURL.INSTRUCTIONS);
                     result = HandleEvent(command.CaId, XSPEditionURL.INSTRUCTIONS);

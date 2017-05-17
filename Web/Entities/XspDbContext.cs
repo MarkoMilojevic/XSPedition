@@ -21,7 +21,9 @@ namespace Web.Entities
 
 		public DbSet<NotificationInfo> NotificationsInfo { get; set; }
 
-		public DbSet<InstructionInfo> InstructionsInfo { get; set; }
+        public DbSet<ResponseInfo> ResponsesInfo { get; set; }
+
+        public DbSet<InstructionInfo> InstructionsInfo { get; set; }
 
         #endregion DENORMALIZED VIEWS
 

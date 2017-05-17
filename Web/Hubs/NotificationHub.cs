@@ -25,22 +25,62 @@ namespace Web.Hubs
             const int sleepTime = 10000;
 
             //ScrubCaCommand command = CreateFirstCAScrubbingEvent();
-            // NotifyCommand command = CreateFirstNotifyEvent();
-            InstructCommand command = CreateFirstInstructionEvent();
-            CaProcessViewModel viewModel = _apiService.Execute(command);
-	        if (viewModel != null)
-	        {
-				Clients.All.updateProcess(viewModel);
-				Thread.Sleep(sleepTime);
-	        }
+            //NotifyCommand command = CreateFirstNotifyEvent();
+            //InstructCommand command = CreateFirstInstructionEvent();
+            //RespondCommand command = CreateFirstResponseEvent();
 
-            command = CreateSecondInstructionEvent();
-            viewModel = _apiService.Execute(command);
-            if (viewModel != null)
+            
+        }
+
+        private RespondCommand CreateFirstResponseEvent()
+        {
+            return new RespondCommand
             {
-                Clients.All.updateProcess(viewModel);
-                Thread.Sleep(sleepTime);
-            }
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Responses = new List<ResponseDto>
+                {
+                    new ResponseDto { AccountNumber = "XSP01", OptionNumber = null, IsSubmitted = false },
+                    new ResponseDto { AccountNumber = "XSP02", OptionNumber = null, IsSubmitted = false },
+                    new ResponseDto { AccountNumber = "XSP03", OptionNumber = null, IsSubmitted = false }
+                }
+            };
+        }
+
+        private RespondCommand CreateSecondResponseEvent()
+        {
+            return new RespondCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Responses = new List<ResponseDto>
+                {
+                    new ResponseDto { AccountNumber = "XSP01", OptionNumber = 3, IsSubmitted = true },
+                    new ResponseDto { AccountNumber = "XSP02", OptionNumber = 2, IsSubmitted = true }
+                }
+            };
+        }
+
+        private RespondCommand CreateThridResponseEvent()
+        {
+            return new RespondCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now.AddDays(27),
+
+                Responses = new List<ResponseDto>
+                {
+                    new ResponseDto { AccountNumber = "XSP03", OptionNumber = 2, IsSubmitted = true }
+                }
+            };
         }
 
         private InstructCommand CreateFirstInstructionEvent()

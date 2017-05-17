@@ -225,6 +225,7 @@
     <Compile Include="Controllers\EventsController.cs" />
     <Compile Include="Entities\InstructionInfo.cs" />
     <Compile Include="Entities\NotificationInfo.cs" />
+    <Compile Include="Entities\ResponseInfo.cs" />
     <Compile Include="Events\CaScrubbedEvent.cs" />
     <Compile Include="Entities\Registries\Maps\CaTypeFieldMap.cs" />
     <Compile Include="Entities\Registries\Maps\OptionTypeFieldMap.cs" />
@@ -275,6 +276,10 @@
     <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.cs" />
     <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.Designer.cs">
       <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705171619368_AddResponseInfoEntity.cs" />
+    <Compile Include="Migrations\201705171619368_AddResponseInfoEntity.Designer.cs">
+      <DependentUpon>201705171619368_AddResponseInfoEntity.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -980,6 +985,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705171442429_AddInstructionInfoTable.resx">
       <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705171619368_AddResponseInfoEntity.resx">
+      <DependentUpon>201705171619368_AddResponseInfoEntity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
