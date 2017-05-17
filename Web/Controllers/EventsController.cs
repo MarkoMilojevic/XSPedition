@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using Web.DTO;
 using Web.Entities;
-using Web.Entities.Denormalized;
 using Web.Entities.Registries;
 using Web.Entities.Shared;
-using Web.Models.Shared;
 using Web.ViewModels;
+using Xspedition.Common;
+using Xspedition.Common.Commands;
+using Xspedition.Common.Dto;
 
 namespace Web.Controllers
 {
@@ -57,7 +57,7 @@ namespace Web.Controllers
             
             List<int> caFieldRegistryIds = _context
                                             .CaTypeFieldMap
-                                            .Where(map => map.CaTypeRegistryId == command.CaTypeId.Value)
+                                            .Where(map => map.CaTypeRegistryId == command.CaTypeId)
                                             .Select(map => map.FieldRegistryId)
                                             .ToList();
 
@@ -71,7 +71,7 @@ namespace Web.Controllers
                 info = new ScrubbingInfo();
                 info.FieldRegistryId = caField.FieldRegistryId;
                 info.CaId = command.CaId;
-                info.CaTypeId = command.CaTypeId.Value;
+                info.CaTypeId = command.CaTypeId;
                 info.OptionNumber = null;
                 info.OptionTypeId = null;
                 info.PayoutNumber = null;
@@ -101,12 +101,12 @@ namespace Web.Controllers
                     info = new ScrubbingInfo();
                     info.FieldRegistryId = optionField.FieldRegistryId;
                     info.CaId = command.CaId;
-                    info.CaTypeId = command.CaTypeId.Value;
+                    info.CaTypeId = command.CaTypeId;
                     info.OptionNumber = optionDto.OptionNumber;
                     info.OptionTypeId = optionDto.OptionTypeId.Value;
                     info.PayoutNumber = null;
                     info.PayoutTypeId = null;
-                    info.FieldDisplay = optionField.FieldDisplay + " (IN)";
+                    info.FieldDisplay = "O #" + optionDto.OptionNumber + " - " + optionField.FieldDisplay + " (IN)";
                     info.ProcessedDateCategory = ProcessedDateCategory.Missing;
                     info.IsSrubbed = false;
 
@@ -131,12 +131,12 @@ namespace Web.Controllers
                         info = new ScrubbingInfo();
                         info.FieldRegistryId = payoutField.FieldRegistryId;
                         info.CaId = command.CaId;
-                        info.CaTypeId = command.CaTypeId.Value;
+                        info.CaTypeId = command.CaTypeId;
                         info.OptionNumber = optionDto.OptionNumber;
                         info.OptionTypeId = optionDto.OptionTypeId.Value;
                         info.PayoutNumber = payoutDto.PayoutNumber;
                         info.PayoutTypeId = payoutDto.PayoutTypeId.Value;
-                        info.FieldDisplay = payoutField.FieldDisplay + " (IN)";
+                        info.FieldDisplay = "O #" + optionDto.OptionNumber + " " + "P #" + payoutDto.PayoutNumber + " - " + payoutField.FieldDisplay + " (IN)";
                         info.ProcessedDateCategory = ProcessedDateCategory.Missing;
                         info.IsSrubbed = false;
 
@@ -160,11 +160,8 @@ namespace Web.Controllers
                 {
                     info = _context.ScrubbingInfo.Single(s => s.FieldRegistryId == caField.Key && s.CaId == command.CaId && s.OptionNumber == null && s.PayoutNumber == null);
 
-                    info.PayoutTypeId = GetCaTypeId(command.CaId);
-
-                    string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == caField.Key).FieldDisplay;
-                    info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
-
+                    info.PayoutTypeId = command.CaTypeId;
+                    info.FieldDisplay = info.FieldDisplay.Substring(0, info.FieldDisplay.Length - 4) + " (CO)";
                     info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
                     info.IsSrubbed = true;
                 }
@@ -178,14 +175,10 @@ namespace Web.Controllers
                     {
                         foreach (KeyValuePair<int, string> optionField in optionDto.Fields)
                         {
-
                             info = _context.ScrubbingInfo.Single(s => s.FieldRegistryId == optionField.Key && s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == null);
 
                             info.PayoutTypeId = GetOptionTypeId(command.CaId, optionDto.OptionNumber);
-
-                            string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == optionField.Key).FieldDisplay;
-                            info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
-
+                            info.FieldDisplay = info.FieldDisplay.Substring(0, info.FieldDisplay.Length - 4) + " (CO)";
                             info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
                             info.IsSrubbed = true;
                         }
@@ -202,10 +195,7 @@ namespace Web.Controllers
                                     info = _context.ScrubbingInfo.Single(s => s.FieldRegistryId == payoutField.Key && s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == payoutDto.PayoutNumber);
 
                                     info.PayoutTypeId = GetPayoutTypeId(command.CaId, optionDto.OptionNumber, payoutDto.PayoutNumber);
-
-                                    string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == payoutField.Key).FieldDisplay;
-                                    info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
-
+                                    info.FieldDisplay = info.FieldDisplay.Substring(0, info.FieldDisplay.Length - 4) + " (CO)";
                                     info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
                                     info.IsSrubbed = true;
                                 }
@@ -216,11 +206,6 @@ namespace Web.Controllers
             }
 
             _context.SaveChanges();
-        }
-
-        private int GetCaTypeId(int caId)
-        {
-            return _context.ScrubbingInfo.First(s => s.CaId == caId && s.CaTypeId != null).CaTypeId.Value;
         }
 
         private int GetOptionTypeId(int caId, int optionNumber)

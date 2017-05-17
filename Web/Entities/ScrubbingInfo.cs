@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Web.Models.Shared;
+using Xspedition.Common;
 
 namespace Web.Entities
 {

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Threading;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using Web.DTO;
 using Web.Service;
 using Web.ViewModels;
+using Xspedition.Common.Commands;
+using Xspedition.Common.Dto;
 
 namespace Web.Hubs
 {

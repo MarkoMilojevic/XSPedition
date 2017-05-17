@@ -15,7 +15,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Web</RootNamespace>
     <AssemblyName>Web</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -119,13 +120,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
@@ -176,6 +177,7 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
@@ -183,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -220,9 +223,7 @@
     <Compile Include="Controllers\SignalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\EventsController.cs" />
-    <Compile Include="DTO\CaScrubbedEvent.cs" />
-    <Compile Include="DTO\Command.cs" />
-    <Compile Include="DTO\ScrubCaCommand.cs" />
+    <Compile Include="Events\CaScrubbedEvent.cs" />
     <Compile Include="Entities\Registries\Maps\CaTypeFieldMap.cs" />
     <Compile Include="Entities\Registries\Maps\OptionTypeFieldMap.cs" />
     <Compile Include="Entities\Registries\Maps\PayoutTypeFieldMap.cs" />
@@ -253,12 +254,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\NotificationHub.cs" />
-    <Compile Include="Migrations\201705170724437_ResetDDL.cs" />
-    <Compile Include="Migrations\201705170724437_ResetDDL.Designer.cs">
-      <DependentUpon>201705170724437_ResetDDL.cs</DependentUpon>
+    <Compile Include="Migrations\201705170755367_UpdateDDL.cs" />
+    <Compile Include="Migrations\201705170755367_UpdateDDL.Designer.cs">
+      <DependentUpon>201705170755367_UpdateDDL.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\Shared\ProcessedDateCategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\ApiHttpClient.cs" />
     <Compile Include="Service\ApiService.cs" />
@@ -948,9 +948,15 @@
     <Content Include="Scripts\jquery-3.1.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201705170724437_ResetDDL.resx">
-      <DependentUpon>201705170724437_ResetDDL.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201705170755367_UpdateDDL.resx">
+      <DependentUpon>201705170755367_UpdateDDL.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Xspedition.Common\Xspedition.Common.csproj">
+      <Project>{f0daaa6d-73f3-47d1-9147-68e9309fdc31}</Project>
+      <Name>Xspedition.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

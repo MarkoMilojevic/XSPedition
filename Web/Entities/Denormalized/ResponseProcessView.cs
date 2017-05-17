@@ -1,4 +1,4 @@
-﻿using Web.Models.Shared;
+﻿using Xspedition.Common;
 
 namespace Web.Entities.Denormalized
 {

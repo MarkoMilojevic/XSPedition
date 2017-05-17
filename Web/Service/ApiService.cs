@@ -3,6 +3,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Web.DTO;
 using Web.ViewModels;
+using Xspedition.Common.Commands;
 
 namespace Web.Service
 {
@@ -18,12 +19,12 @@ namespace Web.Service
 					ScrubCaCommand scrubCaCommand = (ScrubCaCommand) command;
 					ExecuteScrubCa(scrubCaCommand);
 
-					CaScrubbedEvent caScrubbedEvent = new CaScrubbedEvent {CaId = scrubCaCommand.CaId, Date = scrubCaCommand.EventDate};
+					CaScrubbedEvent caScrubbedEvent = new CaScrubbedEvent {CaId = scrubCaCommand.CaId};
 					result = HandleScrubCaEvent(caScrubbedEvent);
 					break;
 				case CommandType.Notify:
 					break;
-				case CommandType.SubmitResponse:
+				case CommandType.Respond:
 					break;
 				case CommandType.Instruct:
 					break;
