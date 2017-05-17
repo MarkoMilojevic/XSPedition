@@ -364,7 +364,7 @@ namespace Web.Controllers
 
                 if (instructionDto.IsInstructed)
                 {
-                    instruction.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Notification, command.CaId, command.EventDate);
+                    instruction.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Instruction, command.CaId, command.EventDate);
                     instruction.IsInstructed = true;
                     instruction.ProcessedDate = command.EventDate;
                 }
@@ -383,7 +383,7 @@ namespace Web.Controllers
         {
             foreach (InstructionDto instructionDto in command.Instructions)
             {
-                InstructionInfo instruction = _context.InstructionsInfo.FirstOrDefault(notif => notif.CaId == command.CaId && notif.AccountNumber == instructionDto.AccountNumber);
+                InstructionInfo instruction = _context.InstructionsInfo.FirstOrDefault(ins => ins.CaId == command.CaId && ins.AccountNumber == instructionDto.AccountNumber);
 
                 if (instruction == null)
                 {
@@ -392,7 +392,7 @@ namespace Web.Controllers
 
                 if (instructionDto.IsInstructed)
                 {
-                    instruction.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Notification, command.CaId, command.EventDate);
+                    instruction.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Instruction, command.CaId, command.EventDate);
                     instruction.IsInstructed = true;
                     instruction.ProcessedDate = command.EventDate;
                 }
@@ -401,6 +401,101 @@ namespace Web.Controllers
                     instruction.ProcessedDateCategory = ProcessedDateCategory.Missing;
                     instruction.IsInstructed = false;
                     instruction.ProcessedDate = null;
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+        #endregion
+
+        #region PAYMENTS
+
+        [HttpGet]
+        [Route("api/events/payments/{caId}")]
+        public IHttpActionResult GetPayments(int caId)
+        {
+            List<PaymentInfo> payments = _context.PaymentsInfo.Where(view => view.CaId == caId).ToList();
+            List<string> targetDateItems = payments.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> criticalDateItems = payments.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> lateDateItems = payments.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.LateDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> missingItems = payments.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.Missing).Select(spv => spv.FieldDisplay).ToList();
+            int processedItemCount = payments.Count(view => view.IsSettled && (view.ProcessedDateCategory == ProcessedDateCategory.TargetDate || view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate));
+            int totalItemCount = payments.Count;
+
+            return Ok(new CaProcessViewModel(ProcessType.Payment, targetDateItems, criticalDateItems, lateDateItems, missingItems, processedItemCount, totalItemCount));
+        }
+
+        [HttpPost]
+        [Route("api/events/payments")]
+        public IHttpActionResult PostPayments([FromBody] PayCommand command)
+        {
+            List<PaymentInfo> payments = _context.PaymentsInfo.Where(view => view.CaId == command.CaId).ToList();
+            if (payments.Count == 0)
+            {
+                CreatePaymentInfo(command);
+            }
+            else
+            {
+                UpdatePaymentInfo(command);
+            }
+
+            return Ok();
+        }
+
+        private void CreatePaymentInfo(PayCommand command)
+        {
+            foreach (PaymentDto paymentDto in command.Payments)
+            {
+                PaymentInfo payment = new PaymentInfo();
+
+                payment.CaId = command.CaId;
+                payment.CaTypeId = command.CaTypeId;
+                payment.VolManCho = command.VolManCho;
+                payment.AccountNumber = paymentDto.AccountNumber;
+                payment.FieldDisplay = "O #" + paymentDto.OptionNumber + " " + "P #" + paymentDto.PayoutNumber + " - " + paymentDto.AccountNumber;
+                payment.OptionNumber = paymentDto.OptionNumber;
+                payment.PayoutNumber = paymentDto.PayoutNumber;
+
+                if (paymentDto.IsSettled)
+                {
+                    payment.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Payment, command.CaId, command.EventDate);
+                    payment.IsSettled = true;
+                    payment.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    payment.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    payment.IsSettled = false;
+                    payment.ProcessedDate = null;
+                }
+                _context.PaymentsInfo.Add(payment);
+            }
+            _context.SaveChanges();
+        }
+
+        private void UpdatePaymentInfo(PayCommand command)
+        {
+            foreach (PaymentDto paymentDto in command.Payments)
+            {
+                PaymentInfo payment = _context.PaymentsInfo.FirstOrDefault(pay => pay.CaId == command.CaId && pay.AccountNumber == paymentDto.AccountNumber && pay.OptionNumber == paymentDto.OptionNumber && pay.PayoutNumber == paymentDto.PayoutNumber);
+
+                if (payment == null)
+                {
+                    continue;
+                }
+
+                if (paymentDto.IsSettled)
+                {
+                    payment.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Payment, command.CaId, command.EventDate);
+                    payment.IsSettled = true;
+                    payment.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    payment.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    payment.IsSettled = false;
+                    payment.ProcessedDate = null;
                 }
             }
 

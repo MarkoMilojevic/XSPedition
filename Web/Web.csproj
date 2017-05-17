@@ -223,6 +223,7 @@
     <Compile Include="Controllers\SignalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\EventsController.cs" />
+    <Compile Include="Entities\PaymentInfo.cs" />
     <Compile Include="Entities\InstructionInfo.cs" />
     <Compile Include="Entities\NotificationInfo.cs" />
     <Compile Include="Entities\ResponseInfo.cs" />
@@ -276,6 +277,10 @@
     <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.cs" />
     <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.Designer.cs">
       <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Migrations\201705171549324_AddPaymentInfoTable.cs" />
+    <Compile Include="Migrations\201705171549324_AddPaymentInfoTable.Designer.cs">
+      <DependentUpon>201705171549324_AddPaymentInfoTable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\201705171619368_AddResponseInfoEntity.cs" />
     <Compile Include="Migrations\201705171619368_AddResponseInfoEntity.Designer.cs">
@@ -988,6 +993,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705171619368_AddResponseInfoEntity.resx">
       <DependentUpon>201705171619368_AddResponseInfoEntity.cs</DependentUpon>
+    </EmbeddedResource>
+	<EmbeddedResource Include="Migrations\201705171549324_AddPaymentInfoTable.resx">
+      <DependentUpon>201705171549324_AddPaymentInfoTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
