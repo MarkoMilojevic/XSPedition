@@ -7,13 +7,13 @@ namespace Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ResetDDL : IMigrationMetadata
+    public sealed partial class UpdateDDL : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ResetDDL));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(UpdateDDL));
         
         string IMigrationMetadata.Id
         {
-            get { return "201705170724437_ResetDDL"; }
+            get { return "201705170755367_UpdateDDL"; }
         }
         
         string IMigrationMetadata.Source

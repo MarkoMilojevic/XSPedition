@@ -1,11 +1,6 @@
 using System;
 using System.IO;
 using Web.Entities;
-using Web.Entities.Core;
-using Web.Entities.Denormalized;
-using Web.Entities.Registries;
-using Web.Entities.Shared;
-using Web.Models.Shared;
 
 namespace Web.Migrations
 {

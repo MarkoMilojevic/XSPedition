@@ -1,7 +1,5 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
-using Web.Entities.Core;
-using Web.Entities.Denormalized;
 using Web.Entities.Registries;
 using Web.Entities.Registries.Maps;
 using Web.Entities.System;

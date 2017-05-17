@@ -1,4 +1,4 @@
-﻿namespace Web.Models.Shared
+﻿namespace Xspedition.Common
 {
 	public enum ProcessedDateCategory
 	{
