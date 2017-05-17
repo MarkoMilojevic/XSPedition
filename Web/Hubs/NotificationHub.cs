@@ -22,18 +22,80 @@ namespace Web.Hubs
 
         public void StartSimulation()
         {
-            const int sleepTime = 10000;
+            const int sleepTime = 2000;
 
-            //ScrubCaCommand command = CreateFirstCAScrubbingEvent();
-            // NotifyCommand command = CreateFirstNotifyEvent();
-            // InstructCommand command = CreateFirstInstructionEvent();
-            PayCommand command = CreateFirstPayEvent();
+            Command command = CreateFirstCAScrubbingEvent();
             CaProcessViewModel viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+            
+            command = CreateFirstNotifyEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+
+            command = CreateSecondNotifyEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+
+            // InstructCommand command = CreateFirstInstructionEvent();
+            command = CreateFirstResponseEvent();
+            viewModel = _apiService.Execute(command);
 	        if (viewModel != null)
 	        {
 				Clients.All.updateProcess(viewModel);
 				Thread.Sleep(sleepTime);
 	        }
+
+            command = CreateSecondResponseEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+
+            command = CreateThridResponseEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+
+            command = CreateFirstInstructionEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+
+            command = CreateSecondInstructionEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+
+            command = CreateFirstPayEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
 
             command = CreateSecondPayEvent();
             viewModel = _apiService.Execute(command);
