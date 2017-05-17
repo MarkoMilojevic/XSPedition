@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Xspedition.Common;
 
 namespace Web.Entities
@@ -14,7 +15,9 @@ namespace Web.Entities
 
 		public int? CaTypeId { get; set; }
 
-		public int? OptionNumber { get; set; }
+        public string VolManCho { get; set; }
+
+        public int? OptionNumber { get; set; }
 
         public int? OptionTypeId { get; set; }
 
@@ -23,6 +26,8 @@ namespace Web.Entities
 	    public int? PayoutTypeId { get; set; }
 
 		public string FieldDisplay { get; set; }
+
+        public DateTime? ProcessedDate { get; set; }
 
 		public ProcessedDateCategory ProcessedDateCategory { get; set; }
 

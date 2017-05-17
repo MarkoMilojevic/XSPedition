@@ -27,13 +27,16 @@ namespace Web.Controllers
         [Route("api/events/scrubbing/{caId}")]
         public IHttpActionResult GetScrubbing(int caId)
         {
-            List<ScrubbingInfo> scrubbingViews = _context.ScrubbingInfo.Where(view => view.CaId == caId).ToList();
-            List<string> targetDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
-            List<string> criticalDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
-            int processedItemCount = scrubbingViews.Count(view => view.IsSrubbed);
-            int totalItemCount = scrubbingViews.Count;
+            List<ScrubbingInfo> scrubbingInfo = _context.ScrubbingInfo.Where(view => view.CaId == caId).ToList();
+            List<string> targetDateItems = scrubbingInfo.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> criticalDateItems = scrubbingInfo.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> lateDateItems = scrubbingInfo.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.LateDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> missingItems = scrubbingInfo.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.Missing).Select(spv => spv.FieldDisplay).ToList();
 
-            return Ok(new CaProcessViewModel(ProcessType.Scrubbing, targetDateItems, criticalDateItems, processedItemCount, totalItemCount));
+            int processedItemCount = scrubbingInfo.Count(view => view.IsSrubbed);
+            int totalItemCount = scrubbingInfo.Count;
+
+            return Ok(new CaProcessViewModel(ProcessType.Scrubbing, targetDateItems, criticalDateItems, lateDateItems, missingItems, processedItemCount, totalItemCount));
         }
 
         [HttpPost]
@@ -218,6 +221,139 @@ namespace Web.Controllers
             return _context.ScrubbingInfo.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.PayoutNumber == payoutNumber && s.PayoutTypeId != null).PayoutTypeId.Value;
         }
 
+        #endregion SCRUBBING
+
+        #region NOTIFICATIONS
+
+        [HttpGet]
+        [Route("api/events/notifications/{caId}")]
+        public IHttpActionResult GetNotifications(int caId)
+        {
+            List<NotificationInfo> notifications = _context.NotificationsInfo.Where(view => view.CaId == caId).ToList();
+            List<string> targetDateItems = notifications.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> criticalDateItems = notifications.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> lateDateItems = notifications.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.LateDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> missingItems = notifications.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.Missing).Select(spv => spv.FieldDisplay).ToList();
+            int processedItemCount = notifications.Count(view => view.IsSent && (view.ProcessedDateCategory == ProcessedDateCategory.TargetDate || view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate));
+            int totalItemCount = notifications.Count;
+
+            return Ok(new CaProcessViewModel(ProcessType.Notification, targetDateItems, criticalDateItems, lateDateItems, missingItems, processedItemCount, totalItemCount));
+        }
+
+        [HttpPost]
+        [Route("api/events/notifications")]
+        public IHttpActionResult PostNotifications([FromBody] NotifyCommand command)
+        {
+            List<NotificationInfo> notifications = _context.NotificationsInfo.Where(view => view.CaId == command.CaId).ToList();
+            if (notifications.Count == 0)
+            {
+                CreateNotificationsInfo(command);
+            } else
+            {
+                UpdateNotificationsInfo(command);
+            }
+
+            return Ok();
+        }
+
+        private void CreateNotificationsInfo(NotifyCommand command)
+        {
+            foreach(NotificationDto notificationDto in command.Notifications)
+            {
+                NotificationInfo notification = new NotificationInfo();
+
+                notification.CaId = command.CaId;
+                notification.CaTypeId = command.CaTypeId;
+                notification.VolManCho = command.VolManCho;
+                notification.AccountNumber = notificationDto.AccountNumber;
+                notification.Recipient = notificationDto.Recipient;
+                notification.FieldDisplay = notificationDto.Recipient + " (" + notificationDto.AccountNumber + ")";
+
+                if(notificationDto.IsSent)
+                {
+                    notification.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Notification, command.CaId, command.EventDate );
+                    notification.IsSent = true;
+                    notification.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    notification.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    notification.IsSent = false;
+                    notification.ProcessedDate = null;
+                }
+                _context.NotificationsInfo.Add(notification);
+            }
+            _context.SaveChanges();
+        }
+
+        private void UpdateNotificationsInfo(NotifyCommand command)
+        {
+            foreach (NotificationDto notificationDto in command.Notifications)
+            {
+                NotificationInfo notification = _context.NotificationsInfo.FirstOrDefault(notif => notif.CaId == command.CaId && notif.AccountNumber == notificationDto.AccountNumber && notif.Recipient == notificationDto.Recipient);
+                
+                if(notification == null)
+                {
+                    continue;
+                }
+
+                if (notificationDto.IsSent)
+                {
+                    notification.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Notification, command.CaId, command.EventDate);
+                    notification.IsSent = true;
+                    notification.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    notification.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    notification.IsSent = false;
+                    notification.ProcessedDate = null;
+                }
+            }
+
+            _context.SaveChanges();
+        }
+
+        #endregion
+        
+        private ProcessedDateCategory CalculateProcessedDateCategory(ProcessType processType, int caId, DateTime eventDate)
+        {
+            DateTime targetDate = new DateTime();
+            DateTime criticalDate = new DateTime();
+            CaTimelineView caTimeline = _context.CaTimelineViews.SingleOrDefault(ctv => ctv.CaId == caId);
+
+            if(caTimeline == null)
+            {
+                return ProcessedDateCategory.Missing;
+            }
+
+            switch (processType)
+            {
+                case ProcessType.Scrubbing:
+                    targetDate = caTimeline.ScrubbingTarget;
+                    criticalDate = caTimeline.ScrubbingCritical;
+                    break;
+                case ProcessType.Notification:
+                    targetDate = caTimeline.NotificationTarget;
+                    criticalDate = caTimeline.NotificationCritical;
+                    break;
+                case ProcessType.Response:
+                    targetDate = caTimeline.ResponseTarget;
+                    criticalDate = caTimeline.ResponseCritical;
+                    break;
+                case ProcessType.Instruction:
+                    targetDate = caTimeline.InstructionTarget;
+                    criticalDate = caTimeline.InstructionCritical;
+                    break;
+                case ProcessType.Payment:
+                    targetDate = caTimeline.PaymentTarget;
+                    criticalDate = caTimeline.PaymentCritical;
+                    break;
+            }
+
+            return GetProcessedDateCategory(eventDate, targetDate, criticalDate);
+        }
+
         private ProcessedDateCategory GetProcessedDateCategory(DateTime eventDate, DateTime targetDate, DateTime criticalDate)
         {
             if (eventDate <= targetDate)
@@ -232,7 +368,5 @@ namespace Web.Controllers
 
             return ProcessedDateCategory.LateDate;
         }
-
-        #endregion SCRUBBING
     }
 }

@@ -223,6 +223,7 @@
     <Compile Include="Controllers\SignalController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\EventsController.cs" />
+    <Compile Include="Entities\NotificationInfo.cs" />
     <Compile Include="Events\CaScrubbedEvent.cs" />
     <Compile Include="Entities\Registries\Maps\CaTypeFieldMap.cs" />
     <Compile Include="Entities\Registries\Maps\OptionTypeFieldMap.cs" />
@@ -257,6 +258,18 @@
     <Compile Include="Migrations\201705170755367_UpdateDDL.cs" />
     <Compile Include="Migrations\201705170755367_UpdateDDL.Designer.cs">
       <DependentUpon>201705170755367_UpdateDDL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705171154544_AddNotificationsInfoTable.cs" />
+    <Compile Include="Migrations\201705171154544_AddNotificationsInfoTable.Designer.cs">
+      <DependentUpon>201705171154544_AddNotificationsInfoTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705171244485_AddVolManChoAndProcessedDateFields.cs" />
+    <Compile Include="Migrations\201705171244485_AddVolManChoAndProcessedDateFields.Designer.cs">
+      <DependentUpon>201705171244485_AddVolManChoAndProcessedDateFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705171251244_SetProcessedDateToNullableField.cs" />
+    <Compile Include="Migrations\201705171251244_SetProcessedDateToNullableField.Designer.cs">
+      <DependentUpon>201705171251244_SetProcessedDateToNullableField.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -907,6 +920,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201705170755367_UpdateDDL.resx">
       <DependentUpon>201705170755367_UpdateDDL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705171154544_AddNotificationsInfoTable.resx">
+      <DependentUpon>201705171154544_AddNotificationsInfoTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705171244485_AddVolManChoAndProcessedDateFields.resx">
+      <DependentUpon>201705171244485_AddVolManChoAndProcessedDateFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705171251244_SetProcessedDateToNullableField.resx">
+      <DependentUpon>201705171251244_SetProcessedDateToNullableField.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

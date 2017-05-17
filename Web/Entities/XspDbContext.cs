@@ -19,11 +19,13 @@ namespace Web.Entities
 
 		public DbSet<ScrubbingInfo> ScrubbingInfo { get; set; }
 
-		#endregion DENORMALIZED VIEWS
+		public DbSet<NotificationInfo> NotificationsInfo { get; set; }
 
-		#region REGISTRIES
+        #endregion DENORMALIZED VIEWS
 
-		public DbSet<CaTypeRegistry> CaTypeRegistry { get; set; }
+        #region REGISTRIES
+
+        public DbSet<CaTypeRegistry> CaTypeRegistry { get; set; }
 		public DbSet<FieldRegistry> FieldRegistry { get; set; }
 		public DbSet<OptionTypeRegistry> OptionTypeRegistry { get; set; }
 		public DbSet<PayoutTypeRegistry> PayoutTypeRegistry { get; set; }

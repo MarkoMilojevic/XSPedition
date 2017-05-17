@@ -22,16 +22,62 @@ namespace Web.Hubs
 
         public void StartSimulation()
         {
-            const int sleepTime = 1000;
+            const int sleepTime = 10000;
 
-            ScrubCaCommand command = CreateFirstCAScrubbingEvent();
+            //ScrubCaCommand command = CreateFirstCAScrubbingEvent();
+            NotifyCommand command = CreateFirstNotifyEvent();
             CaProcessViewModel viewModel = _apiService.Execute(command);
 	        if (viewModel != null)
 	        {
 				Clients.All.updateProcess(viewModel);
 				Thread.Sleep(sleepTime);
 	        }
-		}
+
+            command = CreateSecondNotifyEvent();
+            viewModel = _apiService.Execute(command);
+            if (viewModel != null)
+            {
+                Clients.All.updateProcess(viewModel);
+                Thread.Sleep(sleepTime);
+            }
+        }
+
+        private NotifyCommand CreateFirstNotifyEvent()
+        {
+            return new NotifyCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+
+                Notifications = new List<NotificationDto>
+                {
+                    new NotificationDto { AccountNumber = "XSP01", Recipient = "Alan Harper", IsSent = false},
+                    new NotificationDto { AccountNumber = "XSP02", Recipient = "Herb Malwick", IsSent = false},
+                    new NotificationDto { AccountNumber = "XSP03", Recipient = "Milos Torbica", IsSent = false}
+                }
+            };
+        }
+
+        private NotifyCommand CreateSecondNotifyEvent()
+        {
+            return new NotifyCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+
+                Notifications = new List<NotificationDto>
+                {
+                    new NotificationDto { AccountNumber = "XSP02", Recipient = "Herb Malwick", IsSent = true},
+                    new NotificationDto { AccountNumber = "XSP03", Recipient = "Milos Torbica", IsSent = true}
+                }
+            };
+        }
 
         private ScrubCaCommand CreateFirstCAScrubbingEvent()
         {
@@ -73,5 +119,11 @@ namespace Web.Hubs
                 }
             };
         }
+
+        //private NotifyCommand CreateFirstNotifyCommand()
+        //{
+
+        //}
+
     }
 }

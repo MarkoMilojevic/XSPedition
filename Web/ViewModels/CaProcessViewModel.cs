@@ -5,7 +5,7 @@ namespace Web.ViewModels
 {
 	public class CaProcessViewModel
 	{
-	    public CaProcessViewModel(ProcessType processType, List<string> targetDateItems, List<string> criticalDateItems, int processedItemCount, int totalItemCount)
+	    public CaProcessViewModel(ProcessType processType, List<string> targetDateItems, List<string> criticalDateItems, List<string> lateDateItems, List<string> missingItems, int processedItemCount, int totalItemCount)
 	    {
 	        switch (processType)
 	        {
@@ -38,7 +38,9 @@ namespace Web.ViewModels
 
 	        this.targetDateItems = targetDateItems;
 	        this.criticalDateItems = criticalDateItems;
-	        this.processedItemCount = processedItemCount;
+	        this.lateDateItems = lateDateItems;
+	        this.missingItems = missingItems;
+            this.processedItemCount = processedItemCount;
 	        this.totalItemCount = totalItemCount;
             this.processPercentage = (((decimal)this.processedItemCount) / this.totalItemCount) * 100;
         }
@@ -50,6 +52,10 @@ namespace Web.ViewModels
         public readonly List<string> targetDateItems;
 
         public readonly List<string> criticalDateItems;
+
+        public readonly List<string> lateDateItems;
+        
+        public readonly List<string> missingItems;
 
         public readonly string processActionName;
 

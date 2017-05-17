@@ -19,11 +19,14 @@ namespace Web.Service
 					ScrubCaCommand scrubCaCommand = (ScrubCaCommand) command;
 					ExecuteScrubCa(scrubCaCommand);
 
-					CaScrubbedEvent caScrubbedEvent = new CaScrubbedEvent {CaId = scrubCaCommand.CaId};
-					result = HandleScrubCaEvent(caScrubbedEvent);
+					result = HandleScrubCaEvent(scrubCaCommand.CaId);
 					break;
 				case CommandType.Notify:
-					break;
+                    NotifyCommand notifyCommand = (NotifyCommand)command;
+                    ExecuteSendNotification(notifyCommand);
+
+                    result = HandleSendNotificationEvent(notifyCommand.CaId);
+                    break;
 				case CommandType.Respond:
 					break;
 				case CommandType.Instruct:
@@ -45,11 +48,11 @@ namespace Web.Service
             HttpResponseMessage response = httpClient.PostAsync("api/events/scrubbing", httpContent).Result;
         }
 
-		private CaProcessViewModel HandleScrubCaEvent(CaScrubbedEvent @event)
+		private CaProcessViewModel HandleScrubCaEvent(int caId)
 		{
             HttpClient httpClient = ApiHttpClient.GetHttpClient();
             
-            HttpResponseMessage response = httpClient.GetAsync($"api/events/scrubbing/{@event.CaId}").Result;
+            HttpResponseMessage response = httpClient.GetAsync($"api/events/scrubbing/{caId}").Result;
 			if (!response.IsSuccessStatusCode)
 			{
 				return null;
@@ -58,5 +61,29 @@ namespace Web.Service
 			string responseContent = response.Content.ReadAsStringAsync().Result;
 			return JsonConvert.DeserializeObject<CaProcessViewModel>(responseContent);
 		}
-	}
+
+        public void ExecuteSendNotification(NotifyCommand command)
+        {
+            HttpClient httpClient = ApiHttpClient.GetHttpClient();
+
+            string serializedEvent = JsonConvert.SerializeObject(command);
+            StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
+
+            HttpResponseMessage response = httpClient.PostAsync("api/events/notifications", httpContent).Result;
+        }
+
+        private CaProcessViewModel HandleSendNotificationEvent(int caId)
+        {
+            HttpClient httpClient = ApiHttpClient.GetHttpClient();
+
+            HttpResponseMessage response = httpClient.GetAsync($"api/events/notifications/{caId}").Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            string responseContent = response.Content.ReadAsStringAsync().Result;
+            return JsonConvert.DeserializeObject<CaProcessViewModel>(responseContent);
+        }
+    }
 }
