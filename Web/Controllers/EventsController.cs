@@ -27,7 +27,7 @@ namespace Web.Controllers
         [Route("api/events/scrubbing/{caId}")]
         public IHttpActionResult GetScrubbing(int caId)
         {
-            List<ScrubbingInfo> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == caId).ToList();
+            List<ScrubbingInfo> scrubbingViews = _context.ScrubbingInfo.Where(view => view.CaId == caId).ToList();
             List<string> targetDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
             List<string> criticalDateItems = scrubbingViews.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
             int processedItemCount = scrubbingViews.Count(view => view.IsSrubbed);
@@ -40,7 +40,7 @@ namespace Web.Controllers
         [Route("api/events/scrubbing")]
         public IHttpActionResult PostScrubbing([FromBody] ScrubCaCommand command)
         {
-            List<ScrubbingInfo> scrubbingViews = _context.Scrubbing.Where(view => view.CaId == command.CaId).ToList();
+            List<ScrubbingInfo> scrubbingViews = _context.ScrubbingInfo.Where(view => view.CaId == command.CaId).ToList();
             if (scrubbingViews.Count == 0)
             {
                 CreateScrubbingInfo(command);
@@ -79,7 +79,7 @@ namespace Web.Controllers
                 info.ProcessedDateCategory = ProcessedDateCategory.Missing;
                 info.IsSrubbed = false;
 
-                _context.Scrubbing.Add(info);
+                _context.ScrubbingInfo.Add(info);
             }
 
             foreach (OptionDto optionDto in command.Options)
@@ -108,7 +108,7 @@ namespace Web.Controllers
                     info.ProcessedDateCategory = ProcessedDateCategory.Missing;
                     info.IsSrubbed = false;
 
-                    _context.Scrubbing.Add(info);
+                    _context.ScrubbingInfo.Add(info);
                 }
 
                 foreach (PayoutDto payoutDto in optionDto.Payouts)
@@ -137,7 +137,7 @@ namespace Web.Controllers
                         info.ProcessedDateCategory = ProcessedDateCategory.Missing;
                         info.IsSrubbed = false;
 
-                        _context.Scrubbing.Add(info);
+                        _context.ScrubbingInfo.Add(info);
                     }
                 }
             }
@@ -155,21 +155,13 @@ namespace Web.Controllers
             {
                 foreach (KeyValuePair<int, string> caField in command.Fields)
                 {
-                    info = new ScrubbingInfo();
-                    info.CaId = command.CaId;
-                    info.CaTypeId = command.CaTypeId != null ? command.CaTypeId.Value : GetCaTypeId(command.CaId);
-                    info.OptionNumber = null;
-                    info.OptionTypeId = null;
-                    info.PayoutNumber = null;
-                    info.PayoutTypeId = null;
+                    info = _context.ScrubbingInfo.Single(s => s.CaId == command.CaId && s.OptionNumber == null && s.PayoutNumber == null);
 
                     string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == caField.Key).FieldDisplay;
                     info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
 
                     info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
                     info.IsSrubbed = true;
-
-                    _context.Scrubbing.Add(info);
                 }
             }
 
@@ -181,21 +173,14 @@ namespace Web.Controllers
                     {
                         foreach (KeyValuePair<int, string> optionField in optionDto.Fields)
                         {
-                            info = new ScrubbingInfo();
-                            info.CaId = command.CaId;
-                            info.CaTypeId = command.CaTypeId != null ? command.CaTypeId.Value : GetCaTypeId(command.CaId);
-                            info.OptionNumber = optionDto.OptionNumber;
-                            info.OptionTypeId = optionDto.OptionTypeId != null ? optionDto.OptionTypeId.Value : GetOptionTypeId(command.CaId, optionDto.OptionNumber);
-                            info.PayoutNumber = null;
-                            info.PayoutTypeId = null;
+
+                            info = _context.ScrubbingInfo.Single(s => s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == null);
 
                             string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == optionField.Key).FieldDisplay;
                             info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
 
                             info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
                             info.IsSrubbed = true;
-
-                            _context.Scrubbing.Add(info);
                         }
                     }
 
@@ -207,21 +192,13 @@ namespace Web.Controllers
                             {
                                 foreach (KeyValuePair<int, string> payoutField in payoutDto.Fields)
                                 {
-                                    info = new ScrubbingInfo();
-                                    info.CaId = command.CaId;
-                                    info.CaTypeId = command.CaTypeId != null ? command.CaTypeId.Value : GetCaTypeId(command.CaId);
-                                    info.OptionNumber = optionDto.OptionNumber;
-                                    info.OptionTypeId = optionDto.OptionTypeId != null ? optionDto.OptionTypeId.Value : GetOptionTypeId(command.CaId, optionDto.OptionNumber);
-                                    info.PayoutNumber = payoutDto.PayoutNumber;
-                                    info.PayoutTypeId = payoutDto.PayoutTypeId != null ? payoutDto.PayoutTypeId.Value : GetPayoutTypeId(command.CaId, optionDto.OptionNumber, payoutDto.PayoutNumber);
+                                    info = _context.ScrubbingInfo.Single(s => s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == payoutDto.PayoutNumber);
 
                                     string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == payoutField.Key).FieldDisplay;
                                     info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
 
                                     info.ProcessedDateCategory = GetProcessedDateCategory(@command.EventDate, timeline.ScrubbingTarget, timeline.ScrubbingCritical);
                                     info.IsSrubbed = true;
-
-                                    _context.Scrubbing.Add(info);
                                 }
                             }
                         }
@@ -234,17 +211,17 @@ namespace Web.Controllers
 
         private int GetCaTypeId(int caId)
         {
-            return _context.Scrubbing.First(s => s.CaId == caId && s.CaTypeId != null).CaTypeId.Value;
+            return _context.ScrubbingInfo.First(s => s.CaId == caId && s.CaTypeId != null).CaTypeId.Value;
         }
 
         private int GetOptionTypeId(int caId, int optionNumber)
         {
-            return _context.Scrubbing.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.OptionTypeId != null).OptionTypeId.Value;
+            return _context.ScrubbingInfo.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.OptionTypeId != null).OptionTypeId.Value;
         }
 
         private int GetPayoutTypeId(int caId, int optionNumber, int payoutNumber)
         {
-            return _context.Scrubbing.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.PayoutNumber == payoutNumber && s.PayoutTypeId != null).PayoutTypeId.Value;
+            return _context.ScrubbingInfo.First(s => s.CaId == caId && s.OptionNumber == optionNumber && s.PayoutNumber == payoutNumber && s.PayoutTypeId != null).PayoutTypeId.Value;
         }
 
         private ProcessedDateCategory GetProcessedDateCategory(DateTime eventDate, DateTime targetDate, DateTime criticalDate)

@@ -236,12 +236,12 @@
     <Compile Include="Entities\Core\Payment.cs" />
     <Compile Include="Entities\Core\Payout.cs" />
     <Compile Include="Entities\Core\Response.cs" />
-    <Compile Include="Entities\Denormalized\CaTimelineView.cs" />
+    <Compile Include="Entities\CaTimelineView.cs" />
     <Compile Include="Entities\Denormalized\PaymentProcessView.cs" />
     <Compile Include="Entities\Denormalized\NotificationProcessView.cs" />
     <Compile Include="Entities\Denormalized\InstructionProcessView.cs" />
     <Compile Include="Entities\Denormalized\ResponseProcessView.cs" />
-    <Compile Include="Entities\Denormalized\Scrubbing.cs" />
+    <Compile Include="Entities\ScrubbingInfo.cs" />
     <Compile Include="Entities\Registries\CaTypeRegistry.cs" />
     <Compile Include="Entities\Registries\FieldRegistry.cs" />
     <Compile Include="Entities\Registries\OptionTypeRegistry.cs" />
@@ -256,6 +256,10 @@
     <Compile Include="Migrations\201705161018319_ResetDDL.cs" />
     <Compile Include="Migrations\201705161018319_ResetDDL.Designer.cs">
       <DependentUpon>201705161018319_ResetDDL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705170704537_UnknownChange.cs" />
+    <Compile Include="Migrations\201705170704537_UnknownChange.Designer.cs">
+      <DependentUpon>201705170704537_UnknownChange.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Shared\ProcessedDateCategory.cs" />
@@ -906,6 +910,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201705161018319_ResetDDL.resx">
       <DependentUpon>201705161018319_ResetDDL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705170704537_UnknownChange.resx">
+      <DependentUpon>201705170704537_UnknownChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

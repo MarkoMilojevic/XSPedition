@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Web.Models.Shared;
 
-namespace Web.Entities.Denormalized
+namespace Web.Entities
 {
 	public class ScrubbingInfo
 	{

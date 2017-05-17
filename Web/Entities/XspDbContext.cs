@@ -19,7 +19,7 @@ namespace Web.Entities
 
 		public DbSet<CaTimelineView> CaTimelineViews { get; set; }
 
-		public DbSet<ScrubbingInfo> Scrubbing { get; set; }
+		public DbSet<ScrubbingInfo> ScrubbingInfo { get; set; }
 
 		#endregion DENORMALIZED VIEWS
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Web.Entities.Denormalized
+namespace Web.Entities
 {
 	public class CaTimelineView
 	{
