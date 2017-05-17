@@ -7,6 +7,14 @@ using Xspedition.Common.Commands;
 
 namespace Web.Service
 {
+    public sealed class XSPEditionURL
+    {
+        public static readonly string SCRUB = "api/events/scrubbing"; 
+        public static readonly string NOTIFICATIONS = "api/events/notifications"; 
+        public static readonly string RESPONSES = "api/events/responses"; 
+        public static readonly string INSTRUCTIONS = "api/events/instructions"; 
+        public static readonly string PAYMENTS = "api/events/payments";
+    }
 	public class ApiService
 	{
 		public CaProcessViewModel Execute(Command command)
@@ -16,95 +24,41 @@ namespace Web.Service
 			switch (command.Type)
 			{
 				case CommandType.Scrub:
-					ScrubCaCommand scrubCaCommand = (ScrubCaCommand) command;
-					ExecuteScrubCa(scrubCaCommand);
-
-					result = HandleScrubCaEvent(scrubCaCommand.CaId);
+                    ExecuteCommand(command, XSPEditionURL.SCRUB);
+                    result = HandleEvent(command.CaId, XSPEditionURL.SCRUB);
 					break;
 				case CommandType.Notify:
-                    NotifyCommand notifyCommand = (NotifyCommand)command;
-                    ExecuteSendNotification(notifyCommand);
-
-                    result = HandleSendNotificationEvent(notifyCommand.CaId);
+                    ExecuteCommand(command, XSPEditionURL.NOTIFICATIONS);
+                    result = HandleEvent(command.CaId, XSPEditionURL.NOTIFICATIONS);
                     break;
-				case CommandType.Respond:
+                case CommandType.Respond:
 					break;
 				case CommandType.Instruct:
-                    InstructCommand instructCommand = (InstructCommand)command;
-                    ExecuteInstruction(instructCommand);
-
-                    result = HandleInstructionEvent(instructCommand.CaId);
+                    ExecuteCommand(command, XSPEditionURL.INSTRUCTIONS);
+                    result = HandleEvent(command.CaId, XSPEditionURL.INSTRUCTIONS);
                     break;
-				case CommandType.Pay:
+                case CommandType.Pay:
 					break;
 			}
 
 			return result;
 		}
 
-		public void ExecuteScrubCa(ScrubCaCommand command)
-	    {
-            HttpClient httpClient = ApiHttpClient.GetHttpClient();
-
-            string serializedEvent = JsonConvert.SerializeObject(command);
-            StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
-
-            HttpResponseMessage response = httpClient.PostAsync("api/events/scrubbing", httpContent).Result;
-        }
-
-		private CaProcessViewModel HandleScrubCaEvent(int caId)
-		{
-            HttpClient httpClient = ApiHttpClient.GetHttpClient();
-            
-            HttpResponseMessage response = httpClient.GetAsync($"api/events/scrubbing/{caId}").Result;
-			if (!response.IsSuccessStatusCode)
-			{
-				return null;
-			}
-
-			string responseContent = response.Content.ReadAsStringAsync().Result;
-			return JsonConvert.DeserializeObject<CaProcessViewModel>(responseContent);
-		}
-
-        public void ExecuteSendNotification(NotifyCommand command)
+        public void ExecuteCommand(Command command, string url)
         {
             HttpClient httpClient = ApiHttpClient.GetHttpClient();
 
             string serializedEvent = JsonConvert.SerializeObject(command);
             StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
 
-            HttpResponseMessage response = httpClient.PostAsync("api/events/notifications", httpContent).Result;
+            HttpResponseMessage response = httpClient.PostAsync(url, httpContent).Result;
         }
 
-        private CaProcessViewModel HandleSendNotificationEvent(int caId)
+        private CaProcessViewModel HandleEvent(int caId, string url)
         {
             HttpClient httpClient = ApiHttpClient.GetHttpClient();
 
-            HttpResponseMessage response = httpClient.GetAsync($"api/events/notifications/{caId}").Result;
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            string responseContent = response.Content.ReadAsStringAsync().Result;
-            return JsonConvert.DeserializeObject<CaProcessViewModel>(responseContent);
-        }
-
-        public void ExecuteInstruction(InstructCommand command)
-        {
-            HttpClient httpClient = ApiHttpClient.GetHttpClient();
-
-            string serializedEvent = JsonConvert.SerializeObject(command);
-            StringContent httpContent = new StringContent(serializedEvent, Encoding.Unicode, "application/json");
-
-            HttpResponseMessage response = httpClient.PostAsync("api/events/instructions", httpContent).Result;
-        }
-
-        private CaProcessViewModel HandleInstructionEvent(int caId)
-        {
-            HttpClient httpClient = ApiHttpClient.GetHttpClient();
-
-            HttpResponseMessage response = httpClient.GetAsync($"api/events/instructions/{caId}").Result;
+            HttpResponseMessage response = httpClient.GetAsync($"{url}/{caId}").Result;
             if (!response.IsSuccessStatusCode)
             {
                 return null;
