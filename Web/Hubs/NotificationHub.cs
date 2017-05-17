@@ -161,7 +161,7 @@ namespace Web.Hubs
                 Fields = new Dictionary<int, string>
                 {
                     { 1, "05/01/2017" },
-                    { 4, "05/15/2017" }
+                    { 5, "05/15/2017" }
                 },
                 Options = new List<OptionDto>
                 {
@@ -183,7 +183,7 @@ namespace Web.Hubs
                                 Fields = new Dictionary<int, string>
                                 {
                                     { 1009, "07/01/2017" },
-                                    { 1010, null }
+                                    { 1003, null }
                                 },
                             }
                         }
@@ -192,10 +192,57 @@ namespace Web.Hubs
             };
         }
 
-        //private NotifyCommand CreateFirstNotifyCommand()
-        //{
+        private RespondCommand CreateFirstResponseEvent()
+        {
+            return new RespondCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
 
-        //}
+                Responses = new List<ResponseDto>
+                {
+                    new ResponseDto { AccountNumber = "XSP01", OptionNumber = null, IsSubmitted = false },
+                    new ResponseDto { AccountNumber = "XSP02", OptionNumber = null, IsSubmitted = false },
+                    new ResponseDto { AccountNumber = "XSP03", OptionNumber = null, IsSubmitted = false }
+                }
+            };
+        }
+
+        private RespondCommand CreateSecondResponseEvent()
+        {
+            return new RespondCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Responses = new List<ResponseDto>
+                {
+                    new ResponseDto { AccountNumber = "XSP01", OptionNumber = 3, IsSubmitted = true },
+                    new ResponseDto { AccountNumber = "XSP02", OptionNumber = 2, IsSubmitted = true }
+                }
+            };
+        }
+
+        private RespondCommand CreateThridResponseEvent()
+        {
+            return new RespondCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now.AddDays(27),
+
+                Responses = new List<ResponseDto>
+                {
+                    new ResponseDto { AccountNumber = "XSP03", OptionNumber = 2, IsSubmitted = true }
+                }
+            };
+        }
+
 
     }
 }

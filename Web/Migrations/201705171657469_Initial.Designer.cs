@@ -7,13 +7,13 @@ namespace Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AddResponseInfoEntity : IMigrationMetadata
+    public sealed partial class Initial : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddResponseInfoEntity));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Initial));
         
         string IMigrationMetadata.Id
         {
-            get { return "201705171619368_AddResponseInfoEntity"; }
+            get { return "201705171657469_Initial"; }
         }
         
         string IMigrationMetadata.Source

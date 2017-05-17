@@ -258,33 +258,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\NotificationHub.cs" />
-    <Compile Include="Migrations\201705170755367_UpdateDDL.cs" />
-    <Compile Include="Migrations\201705170755367_UpdateDDL.Designer.cs">
-      <DependentUpon>201705170755367_UpdateDDL.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705171154544_AddNotificationsInfoTable.cs" />
-    <Compile Include="Migrations\201705171154544_AddNotificationsInfoTable.Designer.cs">
-      <DependentUpon>201705171154544_AddNotificationsInfoTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705171244485_AddVolManChoAndProcessedDateFields.cs" />
-    <Compile Include="Migrations\201705171244485_AddVolManChoAndProcessedDateFields.Designer.cs">
-      <DependentUpon>201705171244485_AddVolManChoAndProcessedDateFields.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705171251244_SetProcessedDateToNullableField.cs" />
-    <Compile Include="Migrations\201705171251244_SetProcessedDateToNullableField.Designer.cs">
-      <DependentUpon>201705171251244_SetProcessedDateToNullableField.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.cs" />
-    <Compile Include="Migrations\201705171442429_AddInstructionInfoTable.Designer.cs">
-      <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
-    </Compile>
-	<Compile Include="Migrations\201705171549324_AddPaymentInfoTable.cs" />
-    <Compile Include="Migrations\201705171549324_AddPaymentInfoTable.Designer.cs">
-      <DependentUpon>201705171549324_AddPaymentInfoTable.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705171619368_AddResponseInfoEntity.cs" />
-    <Compile Include="Migrations\201705171619368_AddResponseInfoEntity.Designer.cs">
-      <DependentUpon>201705171619368_AddResponseInfoEntity.cs</DependentUpon>
+    <Compile Include="Migrations\201705171657469_Initial.cs" />
+    <Compile Include="Migrations\201705171657469_Initial.Designer.cs">
+      <DependentUpon>201705171657469_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -976,33 +952,15 @@
     <Content Include="Scripts\jquery-3.1.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201705170755367_UpdateDDL.resx">
-      <DependentUpon>201705170755367_UpdateDDL.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705171154544_AddNotificationsInfoTable.resx">
-      <DependentUpon>201705171154544_AddNotificationsInfoTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705171244485_AddVolManChoAndProcessedDateFields.resx">
-      <DependentUpon>201705171244485_AddVolManChoAndProcessedDateFields.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705171251244_SetProcessedDateToNullableField.resx">
-      <DependentUpon>201705171251244_SetProcessedDateToNullableField.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705171442429_AddInstructionInfoTable.resx">
-      <DependentUpon>201705171442429_AddInstructionInfoTable.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705171619368_AddResponseInfoEntity.resx">
-      <DependentUpon>201705171619368_AddResponseInfoEntity.cs</DependentUpon>
-    </EmbeddedResource>
-	<EmbeddedResource Include="Migrations\201705171549324_AddPaymentInfoTable.resx">
-      <DependentUpon>201705171549324_AddPaymentInfoTable.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Xspedition.Common\Xspedition.Common.csproj">
       <Project>{f0daaa6d-73f3-47d1-9147-68e9309fdc31}</Project>
       <Name>Xspedition.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201705171657469_Initial.resx">
+      <DependentUpon>201705171657469_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

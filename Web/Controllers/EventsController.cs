@@ -316,6 +316,102 @@ namespace Web.Controllers
 
         #endregion
 
+        #region RESPONSES
+
+        [HttpGet]
+        [Route("api/events/responses/{caId}")]
+        public IHttpActionResult GetResponses(int caId)
+        {
+            List<ResponseInfo> responses = _context.ResponsesInfo.Where(view => view.CaId == caId).ToList();
+            List<string> targetDateItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> criticalDateItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> lateDateItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.LateDate).Select(spv => spv.FieldDisplay).ToList();
+            List<string> missingItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.Missing).Select(spv => spv.FieldDisplay).ToList();
+            int processedItemCount = responses.Count(view => view.IsSubmitted && (view.ProcessedDateCategory == ProcessedDateCategory.TargetDate || view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate));
+            int totalItemCount = responses.Count;
+
+            return Ok(new CaProcessViewModel(ProcessType.Response, targetDateItems, criticalDateItems, lateDateItems, missingItems, processedItemCount, totalItemCount));
+        }
+
+        [HttpPost]
+        [Route("api/events/responses")]
+        public IHttpActionResult PostResponses([FromBody] RespondCommand command)
+        {
+            List<ResponseInfo> responses = _context.ResponsesInfo.Where(view => view.CaId == command.CaId).ToList();
+            if (responses.Count == 0)
+            {
+                CreateResponseInfo(command);
+            }
+            else
+            {
+                UpdateResponseInfo(command);
+            }
+
+            return Ok();
+        }
+
+        private void CreateResponseInfo(RespondCommand command)
+        {
+            foreach (ResponseDto responseDto in command.Responses)
+            {
+                ResponseInfo response = new ResponseInfo();
+
+                response.CaId = command.CaId;
+                response.CaTypeId = command.CaTypeId;
+                response.VolManCho = command.VolManCho;
+                response.AccountNumber = responseDto.AccountNumber;
+                response.FieldDisplay = responseDto.AccountNumber;
+
+                if (responseDto.IsSubmitted)
+                {
+                    response.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Response, command.CaId, command.EventDate);
+                    response.IsSubmitted = true;
+                    response.OptionNumber = responseDto.OptionNumber.Value;
+                    response.FieldDisplay += " (Option #" + response.OptionNumber + ")";
+                    response.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    response.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    response.IsSubmitted = false;
+                    response.ProcessedDate = null;
+                }
+                _context.ResponsesInfo.Add(response);
+            }
+            _context.SaveChanges();
+        }
+
+        private void UpdateResponseInfo(RespondCommand command)
+        {
+            foreach (ResponseDto responseDto in command.Responses)
+            {
+                ResponseInfo response = _context.ResponsesInfo.FirstOrDefault(rsp => rsp.CaId == command.CaId && rsp.AccountNumber == responseDto.AccountNumber && rsp.OptionNumber == null);
+
+                if (response == null)
+                {
+                    continue;
+                }
+
+                if (responseDto.IsSubmitted)
+                {
+                    response.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Response, command.CaId, command.EventDate);
+                    response.IsSubmitted = true;
+                    response.OptionNumber = responseDto.OptionNumber.Value;
+                    response.FieldDisplay = response.AccountNumber + " (Option #" + response.OptionNumber + ")";
+                    response.ProcessedDate = command.EventDate;
+                }
+                else
+                {
+                    response.ProcessedDateCategory = ProcessedDateCategory.Missing;
+                    response.IsSubmitted = false;
+                    response.ProcessedDate = null;
+                }
+            }
+            _context.SaveChanges();
+        }
+
+        #endregion
+
         #region INSTRUCTIONS
 
         [HttpGet]
@@ -560,100 +656,5 @@ namespace Web.Controllers
 
         #endregion
 
-        #region RESPONSES
-
-        [HttpGet]
-        [Route("api/events/responses/{caId}")]
-        public IHttpActionResult GetResponses(int caId)
-        {
-            List<ResponseInfo> responses = _context.ResponsesInfo.Where(view => view.CaId == caId).ToList();
-            List<string> targetDateItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.TargetDate).Select(spv => spv.FieldDisplay).ToList();
-            List<string> criticalDateItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate).Select(spv => spv.FieldDisplay).ToList();
-            List<string> lateDateItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.LateDate).Select(spv => spv.FieldDisplay).ToList();
-            List<string> missingItems = responses.Where(view => view.ProcessedDateCategory == ProcessedDateCategory.Missing).Select(spv => spv.FieldDisplay).ToList();
-            int processedItemCount = responses.Count(view => view.IsSubmitted && (view.ProcessedDateCategory == ProcessedDateCategory.TargetDate || view.ProcessedDateCategory == ProcessedDateCategory.CriticalDate));
-            int totalItemCount = responses.Count;
-
-            return Ok(new CaProcessViewModel(ProcessType.Response, targetDateItems, criticalDateItems, lateDateItems, missingItems, processedItemCount, totalItemCount));
-        }
-
-        [HttpPost]
-        [Route("api/events/responses")]
-        public IHttpActionResult PostResponses([FromBody] RespondCommand command)
-        {
-            List<ResponseInfo> responses = _context.ResponsesInfo.Where(view => view.CaId == command.CaId).ToList();
-            if (responses.Count == 0)
-            {
-                CreateResponseInfo(command);
-            }
-            else
-            {
-                UpdateResponseInfo(command);
-            }
-
-            return Ok();
-        }
-        
-        private void CreateResponseInfo(RespondCommand command)
-        {
-            foreach (ResponseDto responseDto in command.Responses)
-            {
-                ResponseInfo response = new ResponseInfo();
-
-                response.CaId = command.CaId;
-                response.CaTypeId = command.CaTypeId;
-                response.VolManCho = command.VolManCho;
-                response.AccountNumber = responseDto.AccountNumber;
-                response.FieldDisplay = responseDto.AccountNumber;
-
-                if (responseDto.IsSubmitted)
-                {
-                    response.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Response, command.CaId, command.EventDate);
-                    response.IsSubmitted = true;
-                    response.OptionNumber = responseDto.OptionNumber.Value;
-                    response.FieldDisplay += " (Option #" + response.OptionNumber + ")";
-                    response.ProcessedDate = command.EventDate;
-                }
-                else
-                {
-                    response.ProcessedDateCategory = ProcessedDateCategory.Missing;
-                    response.IsSubmitted = false;
-                    response.ProcessedDate = null;
-                }
-                _context.ResponsesInfo.Add(response);
-            }
-            _context.SaveChanges();
-        }
-
-        private void UpdateResponseInfo(RespondCommand command)
-        {
-            foreach (ResponseDto responseDto in command.Responses)
-            {
-                ResponseInfo response = _context.ResponsesInfo.FirstOrDefault(rsp => rsp.CaId == command.CaId && rsp.AccountNumber == responseDto.AccountNumber && rsp.OptionNumber == null);
-
-                if (response == null)
-                {
-                    continue;
-                }
-
-                if (responseDto.IsSubmitted)
-                {
-                    response.ProcessedDateCategory = CalculateProcessedDateCategory(ProcessType.Response, command.CaId, command.EventDate);
-                    response.IsSubmitted = true;
-                    response.OptionNumber = responseDto.OptionNumber.Value;
-                    response.FieldDisplay = response.AccountNumber + " (Option #" + response.OptionNumber + ")";
-                    response.ProcessedDate = command.EventDate;
-                }
-                else
-                {
-                    response.ProcessedDateCategory = ProcessedDateCategory.Missing;
-                    response.IsSubmitted = false;
-                    response.ProcessedDate = null;
-                }
-            }
-            _context.SaveChanges();
-        }
-
-        #endregion
     }
 }
