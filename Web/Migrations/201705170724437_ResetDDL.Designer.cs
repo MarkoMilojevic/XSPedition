@@ -7,13 +7,13 @@ namespace Web.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ChangeScrubbingTable : IMigrationMetadata
+    public sealed partial class ResetDDL : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangeScrubbingTable));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ResetDDL));
         
         string IMigrationMetadata.Id
         {
-            get { return "201705161453553_ChangeScrubbingTable"; }
+            get { return "201705170724437_ResetDDL"; }
         }
         
         string IMigrationMetadata.Source

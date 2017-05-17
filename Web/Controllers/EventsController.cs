@@ -69,6 +69,7 @@ namespace Web.Controllers
             foreach (FieldRegistry caField in caFields)
             {
                 info = new ScrubbingInfo();
+                info.FieldRegistryId = caField.FieldRegistryId;
                 info.CaId = command.CaId;
                 info.CaTypeId = command.CaTypeId.Value;
                 info.OptionNumber = null;
@@ -98,6 +99,7 @@ namespace Web.Controllers
                 foreach (FieldRegistry optionField in optionFields)
                 {
                     info = new ScrubbingInfo();
+                    info.FieldRegistryId = optionField.FieldRegistryId;
                     info.CaId = command.CaId;
                     info.CaTypeId = command.CaTypeId.Value;
                     info.OptionNumber = optionDto.OptionNumber;
@@ -127,6 +129,7 @@ namespace Web.Controllers
                     foreach (FieldRegistry payoutField in payoutFields)
                     {
                         info = new ScrubbingInfo();
+                        info.FieldRegistryId = payoutField.FieldRegistryId;
                         info.CaId = command.CaId;
                         info.CaTypeId = command.CaTypeId.Value;
                         info.OptionNumber = optionDto.OptionNumber;
@@ -155,7 +158,9 @@ namespace Web.Controllers
             {
                 foreach (KeyValuePair<int, string> caField in command.Fields)
                 {
-                    info = _context.ScrubbingInfo.Single(s => s.CaId == command.CaId && s.OptionNumber == null && s.PayoutNumber == null);
+                    info = _context.ScrubbingInfo.Single(s => s.FieldRegistryId == caField.Key && s.CaId == command.CaId && s.OptionNumber == null && s.PayoutNumber == null);
+
+                    info.PayoutTypeId = GetCaTypeId(command.CaId);
 
                     string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == caField.Key).FieldDisplay;
                     info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
@@ -174,7 +179,9 @@ namespace Web.Controllers
                         foreach (KeyValuePair<int, string> optionField in optionDto.Fields)
                         {
 
-                            info = _context.ScrubbingInfo.Single(s => s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == null);
+                            info = _context.ScrubbingInfo.Single(s => s.FieldRegistryId == optionField.Key && s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == null);
+
+                            info.PayoutTypeId = GetOptionTypeId(command.CaId, optionDto.OptionNumber);
 
                             string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == optionField.Key).FieldDisplay;
                             info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";
@@ -192,7 +199,9 @@ namespace Web.Controllers
                             {
                                 foreach (KeyValuePair<int, string> payoutField in payoutDto.Fields)
                                 {
-                                    info = _context.ScrubbingInfo.Single(s => s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == payoutDto.PayoutNumber);
+                                    info = _context.ScrubbingInfo.Single(s => s.FieldRegistryId == payoutField.Key && s.CaId == command.CaId && s.OptionNumber == optionDto.OptionNumber && s.PayoutNumber == payoutDto.PayoutNumber);
+
+                                    info.PayoutTypeId = GetPayoutTypeId(command.CaId, optionDto.OptionNumber, payoutDto.PayoutNumber);
 
                                     string fieldDisplay = _context.FieldRegistry.Single(fld => fld.FieldRegistryId == payoutField.Key).FieldDisplay;
                                     info.FieldDisplay = fieldDisplay.Substring(0, fieldDisplay.Length - 4) + " (CO)";

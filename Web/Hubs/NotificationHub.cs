@@ -63,8 +63,8 @@ namespace Web.Hubs
                                 PayoutTypeId = 1,
                                 Fields = new Dictionary<int, string>
                                 {
-                                    { 5, "07/01/2017" },
-                                    { 6, null }
+                                    { 1009, "07/01/2017" },
+                                    { 1010, null }
                                 },
                             }
                         }

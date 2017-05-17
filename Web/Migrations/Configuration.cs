@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Web.Entities;
 using Web.Entities.Core;
 using Web.Entities.Denormalized;
 using Web.Entities.Registries;
@@ -21,6 +22,25 @@ namespace Web.Migrations
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin", string.Empty) + "\\Migrations";
             context.Database.ExecuteSqlCommand(File.ReadAllText(baseDir + "\\seed.sql"));
+
+            context.CaTimelineViews.AddOrUpdate(ctv => ctv.CaTimelineViewId,
+                new CaTimelineView
+                {
+                    CaTimelineViewId = 1,
+                    CaId = 1,
+                    ScrubbingTarget = DateTime.Now.AddDays(5),
+                    ScrubbingCritical = DateTime.Now.AddDays(10),
+                    NotificationTarget = DateTime.Now.AddDays(15),
+                    NotificationCritical = DateTime.Now.AddDays(20),
+                    ResponseTarget = DateTime.Now.AddDays(25),
+                    ResponseCritical = DateTime.Now.AddDays(30),
+                    InstructionTarget = DateTime.Now.AddDays(35),
+                    InstructionCritical = DateTime.Now.AddDays(40),
+                    PaymentTarget = DateTime.Now.AddDays(45),
+                    PaymentCritical = DateTime.Now.AddDays(50),
+                }
+            );
+
             /*
 			context.CaTypeRegistry.AddOrUpdate(lu => lu.CaTypeRegistryId,
 				new CaTypeRegistry { CaTypeRegistryId = 1, Code = "RES" }
@@ -40,24 +60,6 @@ namespace Web.Migrations
 
 	        context.ProcessTypeRegistry.AddOrUpdate(lu => lu.ProcessTypeRegistryId,
 		        new ProcessTypeRegistry {ProcessTypeRegistryId = 1, Type = ProcessType.Scrubbing, Display = "CA Scrubbing"}
-			);
-
-	        context.CaTimelineViews.AddOrUpdate(ctv => ctv.CaTimelineViewId, 
-				new CaTimelineView
-				{
-					CaTimelineViewId = 1,
-					CaId = 1,
-					ScrubbingTarget = DateTime.Now.AddDays(5),
-					ScrubbingCritical = DateTime.Now.AddDays(10),
-					NotificationTarget = DateTime.Now.AddDays(15),
-					NotificationCritical = DateTime.Now.AddDays(20),
-					ResponseTarget = DateTime.Now.AddDays(25),
-					ResponseCritical = DateTime.Now.AddDays(30),
-					InstructionTarget = DateTime.Now.AddDays(35),
-					InstructionCritical = DateTime.Now.AddDays(40),
-					PaymentTarget = DateTime.Now.AddDays(45),
-					PaymentCritical = DateTime.Now.AddDays(50),
-				}
 			);
 
 	        context.Scrubbing.AddOrUpdate(spv => spv.ScrubbingProcessViewId, 

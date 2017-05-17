@@ -6,7 +6,9 @@ namespace Web.Entities
 	public class ScrubbingInfo
 	{
 		[Key]
-		public int ScrubbingId { get; set; }
+		public int ScrubbingInfoId { get; set; }
+
+	    public int FieldRegistryId { get; set; }
 
 		public int CaId { get; set; }
 
