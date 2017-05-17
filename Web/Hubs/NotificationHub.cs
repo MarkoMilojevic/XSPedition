@@ -26,7 +26,8 @@ namespace Web.Hubs
 
             //ScrubCaCommand command = CreateFirstCAScrubbingEvent();
             // NotifyCommand command = CreateFirstNotifyEvent();
-            InstructCommand command = CreateFirstInstructionEvent();
+            // InstructCommand command = CreateFirstInstructionEvent();
+            PayCommand command = CreateFirstPayEvent();
             CaProcessViewModel viewModel = _apiService.Execute(command);
 	        if (viewModel != null)
 	        {
@@ -34,13 +35,48 @@ namespace Web.Hubs
 				Thread.Sleep(sleepTime);
 	        }
 
-            command = CreateSecondInstructionEvent();
+            command = CreateSecondPayEvent();
             viewModel = _apiService.Execute(command);
             if (viewModel != null)
             {
                 Clients.All.updateProcess(viewModel);
                 Thread.Sleep(sleepTime);
             }
+        }
+
+        private PayCommand CreateFirstPayEvent()
+        {
+            return new PayCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Payments = new List<PaymentDto>
+                {
+                    new PaymentDto { AccountNumber = "XSP01", OptionNumber = 1, PayoutNumber = 1, IsSettled = false},
+                    new PaymentDto { AccountNumber = "XSP01", OptionNumber = 1, PayoutNumber = 2, IsSettled = false},
+                    new PaymentDto { AccountNumber = "XSP01", OptionNumber = 2, PayoutNumber = 1, IsSettled = false}
+                }
+            };
+        }
+
+        private PayCommand CreateSecondPayEvent()
+        {
+            return new PayCommand
+            {
+                CaId = 1,
+                CaTypeId = 1,
+                VolManCho = "V",
+                EventDate = DateTime.Now,
+
+                Payments = new List<PaymentDto>
+                {
+                    new PaymentDto { AccountNumber = "XSP01", OptionNumber = 1, PayoutNumber = 1, IsSettled = true},
+                    new PaymentDto { AccountNumber = "XSP01", OptionNumber = 1, PayoutNumber = 2, IsSettled = true}
+                }
+            };
         }
 
         private InstructCommand CreateFirstInstructionEvent()

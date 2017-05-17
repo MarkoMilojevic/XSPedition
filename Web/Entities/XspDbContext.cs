@@ -23,6 +23,8 @@ namespace Web.Entities
 
 		public DbSet<InstructionInfo> InstructionsInfo { get; set; }
 
+		public DbSet<PaymentInfo> PaymentsInfo { get; set; }
+
         #endregion DENORMALIZED VIEWS
 
         #region REGISTRIES

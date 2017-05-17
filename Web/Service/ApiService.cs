@@ -38,8 +38,10 @@ namespace Web.Service
                     result = HandleEvent(command.CaId, XSPEditionURL.INSTRUCTIONS);
                     break;
                 case CommandType.Pay:
-					break;
-			}
+                    ExecuteCommand(command, XSPEditionURL.PAYMENTS);
+                    result = HandleEvent(command.CaId, XSPEditionURL.PAYMENTS);
+                    break;
+            }
 
 			return result;
 		}
